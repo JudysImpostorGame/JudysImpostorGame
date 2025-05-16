@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Spieler- und Impostor-Auswahl</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container column">
+    <h1>Spieler- und Impostor-Auswahl</h1>
+
+    <div class="slider-group">
+      <label for="playerCount">Anzahl Spieler: <span id="playerValue">6</span></label>
+      <input type="range" id="playerCount" min="4" max="15" value="6">
+      <input type="number" id="playerInput" min="4" max="15" value="6">
+    </div>
+
+    <div class="slider-group">
+      <label for="impostorCount">Anzahl Impostors: <span id="impostorValue">1</span></label>
+      <input type="range" id="impostorCount" min="1" max="3" value="1">
+      <input type="number" id="impostorInput" min="1" max="3" value="1">
+    </div>
+
+    <button id="continueButton">Spiel starten</button>
+  </div>
+
+  <script>
+    const playerRange = document.getElementById('playerCount');
+    const playerInput = document.getElementById('playerInput');
+    const playerValue = document.getElementById('playerValue');
+
+    const impostorRange = document.getElementById('impostorCount');
+    const impostorInput = document.getElementById('impostorInput');
+    const impostorValue = document.getElementById('impostorValue');
+
+    function syncSlider(input, slider, label) {
+      input.addEventListener('input', () => {
+        slider.value = input.value;
+        label.textContent = input.value;
+      });
+      slider.addEventListener('input', () => {
+        input.value = slider.value;
+        label.textContent = slider.value;
+      });
+    }
+
+    syncSlider(playerInput, playerRange, playerValue);
+    syncSlider(impostorInput, impostorRange, impostorValue);
+
+    document.getElementById('continueButton').addEventListener('click', () => {
+      const players = parseInt(playerInput.value);
+      const impostors = parseInt(impostorInput.value);
+      if (impostors >= players) {
+        alert("Die Anzahl der Impostors muss kleiner sein als die Anzahl der Spieler.");
+        return;
+      }
+      localStorage.setItem('playerCount', players);
+      localStorage.setItem('impostorCount', impostors);
+      window.location.href = "namen-eingabe.html";
+    });
+  </script>
+</body>
+</html>
