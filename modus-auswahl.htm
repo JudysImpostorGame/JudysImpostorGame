@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Modus-Auswahl</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container column">
+    <h1>Wähle einen Modus</h1>
+    <button class="mode-button" onclick="goTo('offline')">Offline-Modus</button>
+    <button class="mode-button" onclick="goTo('online')">Online-Modus</button>
+  </div>
+
+  <script>
+    function goTo(mode) {
+      if (mode === 'offline') {
+        window.location.href = "spieler-auswahl.html";
+      } else if (mode === 'online') {
+        window.location.href = "online-lobby.html";
+      }
+    }
+  </script>
+</body>
+</html>
