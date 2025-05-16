@@ -79,3 +79,8 @@ body {
   padding: 10px;
   font-size: 16px;
 }
+#roleDisplay {
+  margin: 20px 0;
+  font-size: 24px;
+  font-weight: bold;
+}
