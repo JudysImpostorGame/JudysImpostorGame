@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Karten anzeigen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+    body {
+      font-family: 'Fredoka One', cursive;
+      background: linear-gradient(to bottom right, #ffe0e0, #e0f7fa);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      margin: 0;
+    }
+
+    h1 {
+      font-size: 2.2em;
+      color: #e53935;
+      margin-bottom: 30px;
+    }
+
+    #cardArea {
+      font-size: 2em;
+      padding: 40px;
+      background-color: #ffffffdd;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      min-width: 300px;
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      background-color: #f06292;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 5px 0 #c2185b;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #ec407a;
+    }
+  </style>
+</head>
+<body>
+  <h1>Karte aufdecken</h1>
+  <div id="cardArea">Klicke unten, um deine Karte zu sehen!</div>
+  <button onclick="showCard()">🃏 Karte anzeigen</button>
+
+  <script>
+    const roles = [
+      '🐶 Hund',
+      '🐱 Katze',
+      '🐰 Hase',
+      '🕵️‍♂️ Impostor',
+      '🐷 Schwein',
+      '🐸 Frosch'
+    ];
+
+    function showCard() {
+      const randomIndex = Math.floor(Math.random() * roles.length);
+      const card = roles[randomIndex];
+      document.getElementById('cardArea').textContent = `Du bist: ${card}`;
+    }
+  </script>
+</body>
+</html>
