@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Karten anzeigen</title>
+  <title>Geheimes Wort</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
 
@@ -52,24 +52,23 @@
   </style>
 </head>
 <body>
-  <h1>Karte aufdecken</h1>
-  <div id="cardArea">Klicke unten, um deine Karte zu sehen!</div>
-  <button onclick="showCard()">🃏 Karte anzeigen</button>
+  <h1>Wort anzeigen</h1>
+  <div id="cardArea">Klicke unten, um dein geheimes Wort zu sehen!</div>
+  <button onclick="showWord()">🔍 Wort anzeigen</button>
 
   <script>
-    const roles = [
-      '🐶 Hund',
-      '🐱 Katze',
-      '🐰 Hase',
-      '🕵️‍♂️ Impostor',
-      '🐷 Schwein',
-      '🐸 Frosch'
-    ];
+    const wordList = ['Banane', 'Elefant', 'Pyramide', 'Fußball', 'Pizza', 'Schule'];
+    const chosenWord = wordList[Math.floor(Math.random() * wordList.length)];
 
-    function showCard() {
-      const randomIndex = Math.floor(Math.random() * roles.length);
-      const card = roles[randomIndex];
-      document.getElementById('cardArea').textContent = `Du bist: ${card}`;
+    // Simuliere 1 von 5 Spielern als Impostor (20% Wahrscheinlichkeit)
+    const isImpostor = Math.random() < 0.2;
+
+    function showWord() {
+      if (isImpostor) {
+        document.getElementById('cardArea').textContent = 'Du bist der IMPOSTOR 😈\nDu kennst das Wort nicht!';
+      } else {
+        document.getElementById('cardArea').textContent = `Geheimes Wort: ${chosenWord}`;
+      }
     }
   </script>
 </body>
