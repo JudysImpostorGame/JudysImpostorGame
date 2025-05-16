@@ -75,3 +75,60 @@
   <button class="start-btn" onclick="window.location.href='page1.html'">Start</button>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Spielmodus wählen</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Fredoka One', cursive;
+      background: linear-gradient(to bottom right, #c1e1fb, #fbeec1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.8em;
+      color: #ff6347;
+      margin-bottom: 40px;
+    }
+
+    .mode-btn {
+      padding: 20px 40px;
+      font-size: 1.5em;
+      margin: 20px;
+      background-color: #2196f3;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      box-shadow: 0 5px 0 #1976d2;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .mode-btn:hover {
+      background-color: #1e88e5;
+    }
+
+    .mode-btn:active {
+      box-shadow: none;
+      transform: translateY(5px);
+    }
+  </style>
+</head>
+<body>
+  <h1>Wähle deinen Spielmodus</h1>
+  <button class="mode-btn" onclick="window.location.href='offline.html'">🧑‍🤝‍🧑 Offline-Modus</button>
+  <button class="mode-btn" onclick="window.location.href='online.html'">🌐 Online-Modus</button>
+</body>
+</html>
