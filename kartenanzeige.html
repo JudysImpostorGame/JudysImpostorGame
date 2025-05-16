@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Kartenanzeige</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container column">
+    <h1 id="playerPrompt">Spieler 1, klicke um deine Rolle zu sehen</h1>
+    <button id="revealButton">Karte anzeigen</button>
+    <div id="roleDisplay" style="display: none;"></div>
+    <button id="nextPlayerButton" style="display: none;">Nächster Spieler</button>
+  </div>
+
+  <script>
+    const playerNames = JSON.parse(localStorage.getItem('playerNames')) || [];
+    const impostorCount = parseInt(localStorage.getItem('impostorCount')) || 1;
+
+    // Zufällige Reihenfolge
+    const shuffled = [...playerNames].sort(() => Math.random() - 0.5);
+    const roles = Array(shuffled.length).fill("Crewmate");
+    for (let i = 0; i < impostorCount; i++) {
+      roles[i] = "Impostor";
+    }
+    const finalRoles = roles.sort(() => Math.random() - 0.5);
+
+    let currentIndex = 0;
+    const prompt = document.getElementById("playerPrompt");
+    const revealButton = document.getElementById("revealButton");
+    const roleDisplay = document.getElementById("roleDisplay");
+    const nextPlayerButton = document.getElementById("nextPlayerButton");
+
+    function updatePrompt() {
+      prompt.textContent = `${shuffled[currentIndex]}, klicke um deine Rolle zu sehen`;
+      roleDisplay.style.display = "none";
+      nextPlayerButton.style.display = "none";
+      revealButton.style.display = "inline-block";
+    }
+
+    revealButton.addEventListener("click", () => {
+      roleDisplay.textContent = `Deine Rolle: ${finalRoles[currentIndex]}`;
+      roleDisplay.style.display = "block";
+      revealButton.style.display = "none";
+      nextPlayerButton.style.display = "inline-block";
+    });
+
+    nextPlayerButton.addEventListener("click", () => {
+      currentIndex++;
+      if (currentIndex < shuffled.length) {
+        updatePrompt();
+      } else {
+        prompt.textContent = "Alle Rollen wurden verteilt.";
+        roleDisplay.textContent = "";
+        revealButton.style.display = "none";
+        nextPlayerButton.style.display = "none";
+      }
+    });
+
+    updatePrompt();
+  </script>
+</body>
+</html>
