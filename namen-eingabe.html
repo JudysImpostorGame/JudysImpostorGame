@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Namenseingabe</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container column">
+    <h1>Namenseingabe</h1>
+    <div id="nameFields"></div>
+    <button id="nextButton">Weiter</button>
+  </div>
+
+  <script>
+    const playerCount = parseInt(localStorage.getItem('playerCount')) || 6;
+    const nameFields = document.getElementById('nameFields');
+
+    // Eingabefelder erzeugen
+    for (let i = 1; i <= playerCount; i++) {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = `Spieler ${i} Name`;
+      input.required = true;
+      input.classList.add('name-input');
+      nameFields.appendChild(input);
+    }
+
+    document.getElementById('nextButton').addEventListener('click', () => {
+      const inputs = document.querySelectorAll('.name-input');
+      const names = [];
+
+      for (const input of inputs) {
+        if (input.value.trim() === '') {
+          alert("Bitte alle Namen eingeben.");
+          return;
+        }
+        names.push(input.value.trim());
+      }
+
+      localStorage.setItem('playerNames', JSON.stringify(names));
+      window.location.href = "kartenanzeige.html";
+    });
+  </script>
+</body>
+</html>
