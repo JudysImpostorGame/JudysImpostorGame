@@ -1,43 +1,42 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Find The Impostor</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet" />
 </head>
 <body>
   <div class="top-bar">
     <div class="language-selector">
       <img id="flag" src="germany.png" alt="Sprache" />
     </div>
-    <div class="music-toggle" title="Musik an/aus">
-      🎵
-    </div>
+    <div class="music-toggle">🎵</div>
   </div>
 
   <h1 class="title">Find The Impostor</h1>
 
-  <button class="start-btn" onclick="playPlop()">Start</button>
+  <button class="start-btn" id="startBtn">Start</button>
 
   <!-- 🔊 Sound -->
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
 
-  <!-- Optional: Sprachwechsel-Logik kommt später -->
-
   <script>
+    // Plop Sound
+    const startBtn = document.getElementById("startBtn");
+    const plopSound = document.getElementById("plopSound");
+
+    startBtn.addEventListener("click", () => {
+      plopSound.currentTime = 0;
+      plopSound.play();
+    });
+
+    // Flaggenwechsel
+    const flag = document.getElementById("flag");
     let currentLang = "de";
 
-    function playPlop() {
-      const sound = document.getElementById("plopSound");
-      sound.currentTime = 0;
-      sound.play();
-    }
-
-    // Beispiel: Flagge wechseln (optisch, Funktion später)
-    document.getElementById("flag").addEventListener("click", () => {
-      const flag = document.getElementById("flag");
+    flag.addEventListener("click", () => {
       if (currentLang === "de") {
         flag.src = "usa.png";
         currentLang = "en";
