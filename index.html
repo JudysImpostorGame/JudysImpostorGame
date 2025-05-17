@@ -8,7 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <!-- 🔝 Top-Bar mit Flagge & Musik-Icon -->
   <div class="top-bar">
     <div class="language-selector">
       <img id="flag" src="germany.png" alt="Sprache" />
@@ -16,21 +15,20 @@
     <div class="music-toggle">🎵</div>
   </div>
 
-  <!-- 👾 Charaktere (Impostor + Civilian) -->
-  <div class="characters">
-    <img src="characters.png" alt="Impostor and Civilian" />
+  <!-- 🏃‍♂️ Animation -->
+  <div class="runner">
+    <img src="runner.png" alt="Impostor läuft weg" />
   </div>
 
-  <!-- 🧠 Titel & Start -->
   <h1 class="title">Find The Impostor</h1>
+
   <button class="start-btn" id="startBtn">Start</button>
 
-  <!-- 🔊 Sound-Datei -->
+  <!-- 🔊 Sound -->
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
 
-  <!-- 🧠 Logik -->
   <script>
-    // Plop-Sound beim Startbutton
+    // Plop Sound
     const startBtn = document.getElementById("startBtn");
     const plopSound = document.getElementById("plopSound");
 
@@ -39,7 +37,7 @@
       plopSound.play();
     });
 
-    // Flaggenwechsel zwischen DE und EN
+    // Flaggenwechsel
     const flag = document.getElementById("flag");
     let currentLang = "de";
 
