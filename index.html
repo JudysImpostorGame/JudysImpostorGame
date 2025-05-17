@@ -19,15 +19,21 @@
 
   <button class="start-btn" id="startBtn">Start</button>
 
+  <!-- 🔊 Sound-Effekte -->
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="background.mp3" loop autoplay></audio>
 
   <script>
     const startBtn = document.getElementById("startBtn");
     const plopSound = document.getElementById("plopSound");
+    const bgMusic = document.getElementById("bgMusic");
+    const musicIcon = document.getElementById("musicIcon");
     const flag = document.getElementById("flag");
     const mainTitle = document.getElementById("mainTitle");
 
-    // Texte in beiden Sprachen
+    let currentLang = "de";
+    let musicPlaying = true;
+
     const translations = {
       de: {
         title: "Finde den Impostor",
@@ -39,15 +45,11 @@
       }
     };
 
-    let currentLang = "de";
-
-    // Sound
     startBtn.addEventListener("click", () => {
       plopSound.currentTime = 0;
       plopSound.play();
     });
 
-    // Sprachwechsel
     flag.addEventListener("click", () => {
       if (currentLang === "de") {
         flag.src = "usa.png";
@@ -57,9 +59,19 @@
         currentLang = "de";
       }
 
-      // Text ändern
       mainTitle.innerText = translations[currentLang].title;
       startBtn.innerText = translations[currentLang].start;
+    });
+
+    musicIcon.addEventListener("click", () => {
+      if (musicPlaying) {
+        bgMusic.pause();
+        musicIcon.innerText = "🔇";
+      } else {
+        bgMusic.play();
+        musicIcon.innerText = "🎵";
+      }
+      musicPlaying = !musicPlaying;
     });
   </script>
 </body>
