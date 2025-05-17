@@ -1,13 +1,12 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #b2ebf2; /* Helles Türkis, kein Verlauf mehr */
+  background-color: #b2ebf2; /* Helles Türkis */
   font-family: 'Patrick Hand', cursive;
   overflow: hidden;
 }
 
-
-/* 🔝 Top-Bar */
+/* 🔝 Leiste oben */
 .top-bar {
   display: flex;
   justify-content: space-between;
@@ -15,7 +14,7 @@ body {
   padding: 1rem;
 }
 
-/* 🌐 Sprach-Flagge */
+/* 🌍 Sprachflagge */
 .language-selector img {
   width: 50px;
   height: 50px;
@@ -41,12 +40,24 @@ body {
   transform: scale(1.2);
 }
 
+/* 👾 Charaktere */
+.characters {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.characters img {
+  width: 80px;
+  height: auto;
+}
+
 /* 🧠 Titel */
 .title {
   text-align: center;
   font-size: 3.5rem;
   color: white;
-  margin-top: 100px;
+  margin-top: 30px;
   animation: wiggle 2s infinite;
   text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
@@ -59,7 +70,7 @@ body {
   font-size: 2.5rem;
   border: none;
   border-radius: 50px;
-  background-color: #ce93d8; /* comic-lila */
+  background-color: #ce93d8; /* Comic-Lila */
   color: white;
   font-family: 'Patrick Hand', cursive;
   box-shadow: 0 8px 15px rgba(0,0,0,0.3);
@@ -72,23 +83,11 @@ body {
   box-shadow: 0 10px 20px rgba(0,0,0,0.4);
 }
 
-/* ✨ Animation */
+/* ✨ Titel-Animation */
 @keyframes wiggle {
   0%   { transform: rotate(0deg); }
   25%  { transform: rotate(1.5deg); }
   50%  { transform: rotate(-1.5deg); }
   75%  { transform: rotate(1.5deg); }
   100% { transform: rotate(0deg); }
-}
-.running-characters {
-  width: 100px;
-  position: absolute;
-  top: 60px;
-  left: -120px;
-  animation: runAcross 5s linear infinite;
-}
-
-@keyframes runAcross {
-  0% { left: -120px; }
-  100% { left: 110%; }
 }
