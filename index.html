@@ -15,26 +15,39 @@
     <div class="music-toggle" id="musicIcon">🎵</div>
   </div>
 
-  <h1 class="title wiggle">Find The Impostor</h1>
+  <h1 class="title wiggle" id="mainTitle">Find The Impostor</h1>
 
   <button class="start-btn" id="startBtn">Start</button>
 
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
 
   <script>
-    // Plop-Sound
     const startBtn = document.getElementById("startBtn");
     const plopSound = document.getElementById("plopSound");
+    const flag = document.getElementById("flag");
+    const mainTitle = document.getElementById("mainTitle");
 
+    // Texte in beiden Sprachen
+    const translations = {
+      de: {
+        title: "Finde den Impostor",
+        start: "Start"
+      },
+      en: {
+        title: "Find the Impostor",
+        start: "Start"
+      }
+    };
+
+    let currentLang = "de";
+
+    // Sound
     startBtn.addEventListener("click", () => {
       plopSound.currentTime = 0;
       plopSound.play();
     });
 
-    // Flagge wechseln
-    const flag = document.getElementById("flag");
-    let currentLang = "de";
-
+    // Sprachwechsel
     flag.addEventListener("click", () => {
       if (currentLang === "de") {
         flag.src = "usa.png";
@@ -43,6 +56,10 @@
         flag.src = "germany.png";
         currentLang = "de";
       }
+
+      // Text ändern
+      mainTitle.innerText = translations[currentLang].title;
+      startBtn.innerText = translations[currentLang].start;
     });
   </script>
 </body>
