@@ -12,17 +12,17 @@
     <div class="language-selector">
       <img id="flag" src="germany.png" alt="Sprache" />
     </div>
-    <div class="music-toggle">🎵</div>
+    <div class="music-toggle" id="musicIcon">🎵</div>
   </div>
 
-  <h1 class="title">Find The Impostor</h1>
+  <h1 class="title wiggle">Find The Impostor</h1>
 
   <button class="start-btn" id="startBtn">Start</button>
 
-  <!-- 🔊 Sound -->
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
 
   <script>
+    // Plop-Sound
     const startBtn = document.getElementById("startBtn");
     const plopSound = document.getElementById("plopSound");
 
@@ -31,6 +31,7 @@
       plopSound.play();
     });
 
+    // Flagge wechseln
     const flag = document.getElementById("flag");
     let currentLang = "de";
 
