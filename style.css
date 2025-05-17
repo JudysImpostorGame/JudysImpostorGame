@@ -79,3 +79,15 @@ body {
   75%  { transform: rotate(1.5deg); }
   100% { transform: rotate(0deg); }
 }
+.running-characters {
+  width: 100px;
+  position: absolute;
+  top: 60px;
+  left: -120px;
+  animation: runAcross 5s linear infinite;
+}
+
+@keyframes runAcross {
+  0% { left: -120px; }
+  100% { left: 110%; }
+}
