@@ -8,22 +8,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <!-- 🔵 Bunte Kreise -->
-  <div class="background-animation"></div>
-
-  <!-- 🔝 Sprache + Musik -->
   <div class="top-bar">
     <img id="flag" class="icon" src="germany.png" alt="Sprache" />
     <div class="music-toggle" id="musicIcon">🎵</div>
   </div>
 
-  <!-- 🧠 Titel -->
-  <h1 class="title" id="mainTitle">Finde den Impostor</h1>
-
-  <!-- 🕹️ Start -->
+  <h1 class="title wiggle" id="mainTitle">Finde den Impostor</h1>
   <button class="start-btn" id="startBtn">Start</button>
 
-  <!-- 🔊 Sounds -->
+  <!-- Sounds -->
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="background.mp3" loop autoplay></audio>
 
@@ -37,7 +30,7 @@
 
     const translations = {
       de: { title: "Finde den Impostor", start: "Start", flag: "germany.png" },
-      en: { title: "Find the Impostor", start: "Start", flag: "usa.png" }
+      en: { title: "Find The Impostor", start: "Start", flag: "usa.png" }
     };
 
     let currentLang = navigator.language.startsWith("de") ? "de" : "en";
