@@ -1,5 +1,5 @@
 html {
-  touch-action: manipulation; /* Verhindert Zoom bei Doppeltap */
+  touch-action: manipulation;
 }
 
 body {
@@ -15,7 +15,7 @@ body {
   justify-content: center;
 }
 
-/* 🔝 Titelzeile mit Icons */
+/* 🔝 Titelzeile: Musik - Titel - Flagge */
 .title-bar {
   display: flex;
   align-items: center;
@@ -23,19 +23,6 @@ body {
   gap: 40px;
   margin-bottom: 40px;
   flex-wrap: nowrap;
-}
-
-.icon {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  cursor: pointer;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
-  transition: transform 0.2s ease;
-}
-
-.icon:hover {
-  transform: scale(1.1);
 }
 
 .music-toggle {
@@ -57,6 +44,19 @@ body {
   margin: 0;
 }
 
+.icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+
+.icon:hover {
+  transform: scale(1.1);
+}
+
 @keyframes wiggle {
   0%, 100% { transform: rotate(0deg); }
   25% { transform: rotate(1.5deg); }
@@ -64,7 +64,6 @@ body {
   75% { transform: rotate(1.5deg); }
 }
 
-/* 🕹️ Startbutton */
 .start-btn {
   padding: 1.5rem 3rem;
   font-size: 2.3rem;
