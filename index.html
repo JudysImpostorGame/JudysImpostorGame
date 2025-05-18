@@ -8,6 +8,10 @@
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet" />
 </head>
 <body>
+  <!-- 🔵 animierter Hintergrund -->
+  <div id="particles-js"></div>
+
+  <!-- 🔝 Kopfbereich -->
   <div class="top-bar">
     <div class="language-selector">
       <img id="flag" src="germany.png" alt="Sprache" />
@@ -15,14 +19,18 @@
     <div class="music-toggle" id="musicIcon">🎵</div>
   </div>
 
-  <h1 class="title wiggle" id="mainTitle">Find The Impostor</h1>
+  <!-- 🧠 Titel -->
+  <h1 class="title wiggle" id="mainTitle">Finde den Impostor</h1>
 
+  <!-- 🕹️ Start -->
   <button class="start-btn" id="startBtn">Start</button>
 
-  <!-- 🔊 Sound-Effekte -->
+  <!-- 🔊 Sounds -->
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="background.mp3" loop autoplay></audio>
 
+  <!-- 🔧 Scripts -->
+  <script src="particles.js"></script>
   <script>
     const startBtn = document.getElementById("startBtn");
     const plopSound = document.getElementById("plopSound");
@@ -31,38 +39,38 @@
     const flag = document.getElementById("flag");
     const mainTitle = document.getElementById("mainTitle");
 
-    let currentLang = "de";
     let musicPlaying = true;
+    let currentLang = navigator.language.startsWith("de") ? "de" : "en";
 
     const translations = {
       de: {
         title: "Finde den Impostor",
-        start: "Start"
+        start: "Start",
+        flag: "germany.png"
       },
       en: {
         title: "Find the Impostor",
-        start: "Start"
+        start: "Start",
+        flag: "usa.png"
       }
     };
 
-    startBtn.addEventListener("click", () => {
-      plopSound.currentTime = 0;
-      plopSound.play();
-    });
+    // Startsprache setzen
+    function applyLanguage(lang) {
+      mainTitle.innerText = translations[lang].title;
+      startBtn.innerText = translations[lang].start;
+      flag.src = translations[lang].flag;
+    }
 
+    applyLanguage(currentLang);
+
+    // Flagge klick → Sprache wechseln
     flag.addEventListener("click", () => {
-      if (currentLang === "de") {
-        flag.src = "usa.png";
-        currentLang = "en";
-      } else {
-        flag.src = "germany.png";
-        currentLang = "de";
-      }
-
-      mainTitle.innerText = translations[currentLang].title;
-      startBtn.innerText = translations[currentLang].start;
+      currentLang = currentLang === "de" ? "en" : "de";
+      applyLanguage(currentLang);
     });
 
+    // Musik an/aus
     musicIcon.addEventListener("click", () => {
       if (musicPlaying) {
         bgMusic.pause();
@@ -73,6 +81,18 @@
       }
       musicPlaying = !musicPlaying;
     });
+
+    // Startbutton sound
+    startBtn.addEventListener("click", () => {
+      plopSound.currentTime = 0;
+      plopSound.play();
+    });
+
+    // Hintergrundanimation starten
+    particlesJS.load("particles-js", "particles.json", function() {
+      console.log("Particles geladen");
+    });
   </script>
 </body>
 </html>
+
