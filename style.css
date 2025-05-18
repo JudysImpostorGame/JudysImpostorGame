@@ -1,3 +1,7 @@
+html {
+  touch-action: manipulation; /* Verhindert Zoom bei Doppeltap */
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -11,13 +15,14 @@ body {
   justify-content: center;
 }
 
-/* 🧠 Titelleiste mit Icons */
+/* 🔝 Titelzeile mit Icons */
 .title-bar {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 40px;
   margin-bottom: 40px;
+  flex-wrap: nowrap;
 }
 
 .icon {
@@ -77,4 +82,3 @@ body {
   transform: scale(1.08);
   box-shadow: 0 10px 25px rgba(0,0,0,0.4);
 }
-
