@@ -8,14 +8,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div class="top-bar">
+
+  <!-- 🔝 Titelleiste mit Icons -->
+  <div class="title-bar">
     <img id="flag" class="icon" src="germany.png" alt="Sprache" />
+    <h1 class="title wiggle" id="mainTitle">Finde den Impostor</h1>
     <div class="music-toggle" id="musicIcon">🎵</div>
   </div>
 
-  <h1 class="title wiggle" id="mainTitle">Finde den Impostor</h1>
+  <!-- 🕹️ Start -->
   <button class="start-btn" id="startBtn">Start</button>
 
+  <!-- 🔊 Sounds -->
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="background.mp3" loop autoplay></audio>
 
@@ -66,3 +70,4 @@
   </script>
 </body>
 </html>
+
