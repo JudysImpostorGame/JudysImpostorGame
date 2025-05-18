@@ -9,21 +9,17 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  position: relative;
 }
 
-/* 🔝 Icon-Leiste oben */
-.top-bar {
-  position: absolute;
-  top: 40px; /* nicht zu weit oben */
-  width: 100%;
+/* 🧠 Titelleiste mit Icons */
+.title-bar {
   display: flex;
-  justify-content: space-between;
-  padding: 0 50px;
-  z-index: 2;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  margin-bottom: 40px;
 }
 
-/* 🌐 Sprache-Icon */
 .icon {
   width: 70px;
   height: 70px;
@@ -37,7 +33,6 @@ body {
   transform: scale(1.1);
 }
 
-/* 🔊 Musik-Icon */
 .music-toggle {
   font-size: 60px;
   cursor: pointer;
@@ -49,14 +44,12 @@ body {
   transform: scale(1.1);
 }
 
-/* 🧠 Titel */
 .title {
   font-size: 4rem;
   color: white;
   text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
-  margin-top: 140px;
   animation: wiggle 2s infinite;
-  z-index: 2;
+  margin: 0;
 }
 
 @keyframes wiggle {
@@ -66,9 +59,8 @@ body {
   75% { transform: rotate(1.5deg); }
 }
 
-/* 🕹 Start-Button */
+/* 🕹️ Startbutton */
 .start-btn {
-  margin-top: 40px;
   padding: 1.5rem 3rem;
   font-size: 2.3rem;
   border: none;
@@ -79,10 +71,10 @@ body {
   box-shadow: 0 6px 16px rgba(0,0,0,0.25);
   cursor: pointer;
   transition: all 0.25s ease;
-  z-index: 2;
 }
 
 .start-btn:hover {
   transform: scale(1.08);
   box-shadow: 0 10px 25px rgba(0,0,0,0.4);
 }
+
