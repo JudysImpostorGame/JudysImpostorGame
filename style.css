@@ -1,23 +1,32 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: #b2ebf2; /* Hell-türkis */
   font-family: 'Patrick Hand', cursive;
   overflow: hidden;
+  background: #1e1f26;
 }
 
-/* 🔝 Top-Bar */
+#particles-js {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  top: 0;
+  left: 0;
+}
+
 .top-bar {
+  position: absolute;
+  width: 100%;
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: 1.5rem;
+  z-index: 2;
 }
 
-/* 🌐 Sprach-Flagge (jetzt größer & comic-stiliger) */
 .language-selector img {
-  width: 70px;
-  height: 70px;
+  width: 65px;
+  height: 65px;
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 0 8px rgba(0,0,0,0.2);
@@ -28,9 +37,8 @@ body {
   transform: scale(1.1);
 }
 
-/* 🔊 Musik-Button (jetzt größer) */
 .music-toggle {
-  font-size: 60px;
+  font-size: 55px;
   cursor: pointer;
   user-select: none;
   transition: transform 0.2s ease;
@@ -40,45 +48,42 @@ body {
   transform: scale(1.2);
 }
 
-/* 🧠 Titel */
 .title {
   text-align: center;
   font-size: 4rem;
   color: white;
-  margin-top: 120px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-}
-
-/* ✨ Wackelanimation */
-.wiggle {
+  margin-top: 140px;
   animation: wiggle 2s infinite;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+  z-index: 2;
+  position: relative;
 }
 
 @keyframes wiggle {
-  0%   { transform: rotate(0deg); }
-  25%  { transform: rotate(1.5deg); }
-  50%  { transform: rotate(-1.5deg); }
-  75%  { transform: rotate(1.5deg); }
-  100% { transform: rotate(0deg); }
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(1.5deg); }
+  50% { transform: rotate(-1.5deg); }
+  75% { transform: rotate(1.5deg); }
 }
 
-/* 🎮 Start-Button */
 .start-btn {
   display: block;
   margin: 60px auto;
-  padding: 1.2rem 2.5rem;
+  padding: 1.5rem 3rem;
   font-size: 2.5rem;
   border: none;
   border-radius: 50px;
-  background-color: #ce93d8;
+  background-color: #9b59b6;
   color: white;
   font-family: 'Patrick Hand', cursive;
-  box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
 }
 
 .start-btn:hover {
-  transform: scale(1.07);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
 }
