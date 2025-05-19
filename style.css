@@ -16,24 +16,6 @@ body {
   position: relative;
 }
 
-/* ☁️ Wolkenanimation */
-.clouds {
-  position: absolute;
-  top: 10px;
-  left: -200px;
-  width: 400px;
-  height: 100px;
-  background: url('https://i.ibb.co/vDqHY2x/cloud.png') repeat-x;
-  background-size: contain;
-  animation: cloud-move 60s linear infinite;
-  z-index: 0;
-}
-
-@keyframes cloud-move {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(2000px); }
-}
-
 /* 🔝 Titelzeile */
 .title-bar {
   display: flex;
