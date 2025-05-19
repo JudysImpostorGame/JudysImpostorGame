@@ -27,8 +27,8 @@ body {
 }
 
 .icon {
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 0 10px rgba(0,0,0,0.3);
@@ -42,8 +42,8 @@ body {
 /* Verhindert Sprung beim Bildwechsel */
 .flag {
   display: block;
-  width: 70px;
-  height: 70px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
 }
 
