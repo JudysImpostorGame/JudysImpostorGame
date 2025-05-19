@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Modus wählen</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ☁️ Wolken + Animation -->
+  <div class="clouds"></div>
+  <img src="runner.png" class="runner" alt="Runner Animation" />
+
+  <!-- 🔝 Icons + Titel -->
+  <div class="title-bar">
+    <img id="flag" class="icon flag" src="germany.png" alt="Sprache" />
+    <h1 class="title" id="mainTitle">Wähle deinen Modus</h1>
+    <div class="music-toggle" id="musicIcon">🎵</div>
+  </div>
+
+  <!-- 🕹️ Auswahlbuttons -->
+  <button class="mode-btn" id="offlineBtn">Offline-Modus</button>
+  <button class="mode-btn" id="onlineBtn">Online-Modus</button>
+
+  <!-- 🔊 Sounds -->
+  <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
+  <audio id="bgMusic" src="background.mp3" loop autoplay></audio>
+
+  <!-- 🔧 Scripts -->
+  <script src="music.js"></script>
+  <script>
+    const plopSound = document.getElementById("plopSound");
+    const offlineBtn = document.getElementById("offlineBtn");
+    const onlineBtn = document.getElementById("onlineBtn");
+    const flag = document.getElementById("flag");
+    const title = document.getElementById("mainTitle");
+
+    // Sprache übernehmen
+    const translations = {
+      de: {
+        title: "Wähle deinen Modus",
+        offline: "Offline-Modus",
+        online: "Online-Modus",
+        flag: "germany.png"
+      },
+      en: {
+        title: "Choose your mode",
+        offline: "Offline Mode",
+        online: "Online Mode",
+        flag: "usa.png"
+      }
+    };
+
+    let currentLang = localStorage.getItem("language") || (navigator.language.startsWith("de") ? "de" : "en");
+
+    function applyLanguage(lang) {
+      title.textContent = translations[lang].title;
+      offlineBtn.textContent = translations[lang].offline;
+      onlineBtn.textContent = translations[lang].online;
+      flag.src = translations[lang].flag;
+    }
+
+    applyLanguage(currentLang);
+
+    flag.addEventListener("click", () => {
+      currentLang = currentLang === "de" ? "en" : "de";
+      localStorage.setItem("language", currentLang);
+      applyLanguage(currentLang);
+    });
+
+    // Plop Sound bei Klick
+    offlineBtn.addEventListener("click", () => plopSound.play());
+    onlineBtn.addEventListener("click", () => plopSound.play());
+  </script>
+</body>
+</html>
