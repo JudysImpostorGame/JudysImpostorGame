@@ -9,14 +9,20 @@
 </head>
 <body>
 
+  <!-- ☁️ Wolkenanimation -->
+  <div class="clouds"></div>
+
+  <!-- 🔝 Icons + Titel -->
   <div class="title-bar">
-    <div class="music-toggle" id="musicIcon">🎵</div>
+    <img id="flag" class="icon flag" src="germany.png" alt="Sprache" />
     <h1 class="title" id="mainTitle">Finde den Impostor</h1>
-    <img id="flag" class="icon" src="germany.png" alt="Sprache" />
+    <div class="music-toggle" id="musicIcon">🎵</div>
   </div>
 
+  <!-- 🕹️ Start -->
   <button class="start-btn" id="startBtn">Start</button>
 
+  <!-- 🔊 Sounds -->
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="background.mp3" loop autoplay></audio>
 
@@ -37,9 +43,9 @@
     let musicPlaying = true;
 
     function applyLanguage(lang) {
-      mainTitle.innerText = translations[lang].title;
-      startBtn.innerText = translations[lang].start;
-      flag.src = translations[lang].flag;
+      mainTitle.textContent = translations[lang].title;
+      startBtn.textContent = translations[lang].start;
+      flag.setAttribute("src", translations[lang].flag);
     }
 
     applyLanguage(currentLang);
@@ -52,10 +58,10 @@
     musicIcon.addEventListener("click", () => {
       if (musicPlaying) {
         bgMusic.pause();
-        musicIcon.innerText = "🔇";
+        musicIcon.textContent = "🔇";
       } else {
         bgMusic.play();
-        musicIcon.innerText = "🎵";
+        musicIcon.textContent = "🎵";
       }
       musicPlaying = !musicPlaying;
     });
