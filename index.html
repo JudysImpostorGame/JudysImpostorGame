@@ -9,10 +9,11 @@
 </head>
 <body>
 
-  <!-- 🏃‍♂️ Deine eigene Animation -->
+  <!-- ☁️ Wolken -->
+  <div class="clouds"></div>
   <img src="runner.png" class="runner" alt="Runner Animation" />
 
-  <!-- 🔝 Titel + Icons -->
+  <!-- 🔝 Icons + Titel -->
   <div class="title-bar">
     <img id="flag" class="icon flag" src="germany.png" alt="Sprache" />
     <h1 class="title" id="mainTitle">Finde den Impostor</h1>
@@ -26,24 +27,24 @@
   <audio id="plopSound" src="plop.mp3" preload="auto"></audio>
   <audio id="bgMusic" src="background.mp3" loop autoplay></audio>
 
+  <!-- 🔧 Scripts -->
+  <script src="music.js"></script>
   <script>
     const startBtn = document.getElementById("startBtn");
     const plopSound = document.getElementById("plopSound");
-    const bgMusic = document.getElementById("bgMusic");
-    const musicIcon = document.getElementById("musicIcon");
     const flag = document.getElementById("flag");
-    const mainTitle = document.getElementById("mainTitle");
+    const title = document.getElementById("mainTitle");
 
+    // Sprache
     const translations = {
       de: { title: "Finde den Impostor", start: "Start", flag: "germany.png" },
       en: { title: "Find The Impostor", start: "Start", flag: "usa.png" }
     };
 
-    let currentLang = navigator.language.startsWith("de") ? "de" : "en";
-    let musicPlaying = true;
+    let currentLang = localStorage.getItem("language") || (navigator.language.startsWith("de") ? "de" : "en");
 
     function applyLanguage(lang) {
-      mainTitle.textContent = translations[lang].title;
+      title.textContent = translations[lang].title;
       startBtn.textContent = translations[lang].start;
       flag.setAttribute("src", translations[lang].flag);
     }
@@ -52,27 +53,20 @@
 
     flag.addEventListener("click", () => {
       currentLang = currentLang === "de" ? "en" : "de";
+      localStorage.setItem("language", currentLang);
       applyLanguage(currentLang);
     });
 
-    musicIcon.addEventListener("click", () => {
-      if (musicPlaying) {
-        bgMusic.pause();
-        musicIcon.textContent = "🔇";
-      } else {
-        bgMusic.play();
-        musicIcon.textContent = "🎵";
-      }
-      musicPlaying = !musicPlaying;
-    });
-
+    // ✅ Startbutton → Plopp + Weiterleitung zu page2.html
     startBtn.addEventListener("click", () => {
       plopSound.currentTime = 0;
       plopSound.play();
+
+      // Nach 300ms zur nächsten Seite
+      setTimeout(() => {
+        window.location.href = "page2.html";
+      }, 300);
     });
   </script>
 </body>
-  <script src="music.js"></script>
-
 </html>
-
