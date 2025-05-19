@@ -1,23 +1,29 @@
-const musicIcon = document.getElementById("musicIcon");
-const bgMusic = document.getElementById("bgMusic");
+document.addEventListener("DOMContentLoaded", () => {
+  const musicIcon = document.getElementById("musicIcon");
+  const bgMusic = document.getElementById("bgMusic");
 
-if (localStorage.getItem("musicPlaying") === "false") {
-  bgMusic.pause();
-  musicIcon.textContent = "🔇";
-} else {
-  bgMusic.play();
-  musicIcon.textContent = "🎵";
-  localStorage.setItem("musicPlaying", "true");
-}
+  if (!musicIcon || !bgMusic) return; // Sicherheitscheck
 
-musicIcon.addEventListener("click", () => {
-  if (bgMusic.paused) {
+  // Zustand beim Laden prüfen
+  if (localStorage.getItem("musicPlaying") === "false") {
+    bgMusic.pause();
+    musicIcon.textContent = "🔇";
+  } else {
     bgMusic.play();
     musicIcon.textContent = "🎵";
     localStorage.setItem("musicPlaying", "true");
-  } else {
-    bgMusic.pause();
-    musicIcon.textContent = "🔇";
-    localStorage.setItem("musicPlaying", "false");
   }
+
+  // Umschalten + speichern
+  musicIcon.addEventListener("click", () => {
+    if (bgMusic.paused) {
+      bgMusic.play();
+      musicIcon.textContent = "🎵";
+      localStorage.setItem("musicPlaying", "true");
+    } else {
+      bgMusic.pause();
+      musicIcon.textContent = "🔇";
+      localStorage.setItem("musicPlaying", "false");
+    }
+  });
 });
