@@ -5,7 +5,7 @@ html {
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Patrick+Hand', cursive;
+  font-family: 'Patrick Hand', cursive;
   background: linear-gradient(145deg, #b2ebf2, #81d4fa);
   overflow: hidden;
   height: 100vh;
@@ -16,22 +16,22 @@ body {
   position: relative;
 }
 
-/* ☁️ Wolkenanimation */
+/* ☁️ Wolken mit eigenem Bild */
 .clouds {
   position: absolute;
-  top: 10px;
-  left: -200px;
-  width: 400px;
-  height: 100px;
-  background: url('https://i.ibb.co/vDqHY2x/cloud.png') repeat-x;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 120px;
+  background: url('wolke.png') repeat-x;
   background-size: contain;
-  animation: cloud-move 60s linear infinite;
+  animation: cloud-move 30s linear infinite;
   z-index: 0;
 }
 
 @keyframes cloud-move {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(2000px); }
+  0% { background-position-x: 0; }
+  100% { background-position-x: 2000px; }
 }
 
 /* 🔝 Titelzeile */
@@ -57,7 +57,6 @@ body {
   transform: scale(1.1);
 }
 
-/* Verhindert Sprung beim Bildwechsel */
 .flag {
   display: block;
   width: 70px;
@@ -82,6 +81,7 @@ body {
   text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
   animation: wiggle 2s infinite;
   margin: 0;
+  z-index: 2;
 }
 
 @keyframes wiggle {
@@ -102,6 +102,7 @@ body {
   box-shadow: 0 6px 16px rgba(0,0,0,0.25);
   cursor: pointer;
   transition: all 0.25s ease;
+  z-index: 1;
 }
 
 .start-btn:hover {
