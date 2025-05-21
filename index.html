@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Find the Impostor</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: Comic Sans MS, sans-serif;
+      text-align: center;
+      background: linear-gradient(to bottom, #fbc2eb, #a6c1ee);
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+    }
+    .box {
+      background: white;
+      padding: 20px;
+      margin: auto;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      max-width: 400px;
+    }
+    input, button {
+      font-size: 1em;
+      margin: 10px;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+    }
+    button {
+      background-color: #8e44ad;
+      color: white;
+      cursor: pointer;
+    }
+    .result {
+      font-size: 1.2em;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Find the Impostor 👀</h1>
+  <div class="box">
+    <label>Number of Players (3–10):</label><br>
+    <input id="playerCount" type="number" min="3" max="10" value="4"><br>
+    <button onclick="startGame()">Start Game</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const words = ["Apple", "Piano", "Paris", "Tiger", "Pizza", "Football", "Sun", "School", "Elephant", "Cake"];
+
+    function startGame() {
+      const count = parseInt(document.getElementById('playerCount').value);
+      if (count < 3 || count > 10) {
+        alert("Choose between 3 and 10 players.");
+        return;
+      }
+
+      const impostorIndex = Math.floor(Math.random() * count);
+      const word = words[Math.floor(Math.random() * words.length)];
+      let html = `<p>Give this screen to each player one by one:</p><ol>`;
+
+      for (let i = 0; i < count; i++) {
+        const playerWord = (i === impostorIndex) ? "You are the IMPOSTOR! ❌" : `Your word is: <strong>${word}</strong>`;
+        html += `<li><button onclick="alert('${playerWord}')">Player ${i + 1}</button></li>`;
+      }
+      html += `</ol><p>Start your descriptions and vote!</p>`;
+
+      document.getElementById('result').innerHTML = html;
+    }
+  </script>
+</body>
+</html>
