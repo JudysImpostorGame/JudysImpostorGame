@@ -64,17 +64,19 @@
   <script>
     const players = [];
     const categories = {
-      Sportarten: ["Basketball", "Tennis", "Skifahren", "Boxen", "Schwimmen", "Judo", "Handball", "Volleyball", "Fußball", "Rugby", "Eishockey", "Klettern", "Baseball", "Turnen", "Fechten", "Golf"],
-      Politiker: ["Angela Merkel", "Barack Obama", "Donald Trump", "Winston Churchill", "Emmanuel Macron", "Olaf Scholz", "Ursula von der Leyen", "Wladimir Putin"],
-      Sänger: ["Rihanna", "Michael Jackson", "Adele", "Beyoncé", "Ed Sheeran", "Shakira", "Helene Fischer", "Lena Meyer-Landrut"],
-      Schauspieler: ["Leonardo DiCaprio", "Brad Pitt", "Angelina Jolie", "Emma Watson", "Will Smith", "Keanu Reeves", "Tom Hanks", "Johnny Depp"],
-      Länder: ["Deutschland", "Frankreich", "Italien", "Japan", "Kanada", "Brasilien", "Ägypten", "Südafrika", "Australien", "Indien", "China"],
-      Tiere: ["Hund", "Katze", "Löwe", "Tiger", "Elefant", "Panda", "Adler", "Känguru", "Delfin", "Biene"],
-      Essen: ["Pizza", "Sushi", "Spaghetti", "Pommes", "Burger", "Salat", "Käse", "Schokolade", "Wurst", "Croissant"],
-      Berufe: ["Arzt", "Lehrer", "Polizist", "Ingenieur", "Schauspieler", "Musiker", "Pilot", "Bäcker", "Friseur", "Bauarbeiter"],
-      Marken: ["Nike", "Adidas", "Apple", "Samsung", "Coca-Cola", "BMW", "Mercedes", "Google", "Amazon", "Zara"],
-      Promis: ["Cristiano Ronaldo", "Lionel Messi", "Elon Musk", "Pablo Picasso", "Serena Williams", "Usain Bolt", "Roger Federer", "Mark Zuckerberg"]
+      Sportarten: ["Basketball", "Tennis", "Skifahren", "Boxen", "Schwimmen", "Judo", "Handball", "Volleyball", "Fußball", "Rugby", "Eishockey", "Klettern", "Baseball", "Turnen", "Fechten", "Golf", "Surfen", "Snowboarden"],
+      Politiker: ["Angela Merkel", "Barack Obama", "Donald Trump", "Winston Churchill", "Emmanuel Macron", "Olaf Scholz", "Ursula von der Leyen", "Wladimir Putin", "Joe Biden", "Nelson Mandela", "Xi Jinping"],
+      Sänger: ["Rihanna", "Michael Jackson", "Adele", "Beyoncé", "Ed Sheeran", "Shakira", "Helene Fischer", "Lena Meyer-Landrut", "Justin Bieber", "The Weeknd", "Taylor Swift"],
+      Schauspieler: ["Leonardo DiCaprio", "Brad Pitt", "Angelina Jolie", "Emma Watson", "Will Smith", "Keanu Reeves", "Tom Hanks", "Johnny Depp", "Jennifer Lawrence", "Dwayne Johnson"],
+      Länder: ["Deutschland", "Frankreich", "Italien", "Japan", "Kanada", "Brasilien", "Ägypten", "Südafrika", "Australien", "Indien", "China", "USA", "Mexiko", "Spanien"],
+      Tiere: ["Hund", "Katze", "Löwe", "Tiger", "Elefant", "Panda", "Adler", "Känguru", "Delfin", "Biene", "Giraffe", "Zebra", "Krokodil"],
+      Essen: ["Pizza", "Sushi", "Spaghetti", "Pommes", "Burger", "Salat", "Käse", "Schokolade", "Wurst", "Croissant", "Torte", "Lasagne", "Pfannkuchen"],
+      Berufe: ["Arzt", "Lehrer", "Polizist", "Ingenieur", "Schauspieler", "Musiker", "Pilot", "Bäcker", "Friseur", "Bauarbeiter", "Koch", "Verkäufer"],
+      Marken: ["Nike", "Adidas", "Apple", "Samsung", "Coca-Cola", "BMW", "Mercedes", "Google", "Amazon", "Zara", "Lidl", "Netflix", "IKEA"],
+      Promis: ["Cristiano Ronaldo", "Lionel Messi", "Elon Musk", "Pablo Picasso", "Serena Williams", "Usain Bolt", "Roger Federer", "Mark Zuckerberg", "Kanye West"]
     };
+
+    categories.Alle = Object.values(categories).flat();
 
     let assignedWords = {};
     let impostors = [];
@@ -91,12 +93,20 @@
       const name = document.getElementById("playerName").value.trim();
       if (name && !players.includes(name)) {
         players.push(name);
+        displayPlayers();
+        document.getElementById("playerName").value = "";
+      }
+    }
+
+    function displayPlayers() {
+      const playerList = document.getElementById("playerList");
+      playerList.innerHTML = "";
+      players.forEach(name => {
         const btn = document.createElement("button");
         btn.textContent = name;
         btn.onclick = () => revealWord(name, btn);
-        document.getElementById("playerList").appendChild(btn);
-        document.getElementById("playerName").value = "";
-      }
+        playerList.appendChild(btn);
+      });
     }
 
     function startGame() {
@@ -127,6 +137,7 @@
         assignedWords[name] = impostors.includes(name) ? "IMPOSTOR" : selectedWord;
       }
 
+      displayPlayers();
       alert("Wörter wurden verteilt! Klicke auf deinen Namen, um dein Wort zu sehen.");
     }
 
@@ -140,11 +151,10 @@
     }
 
     function resetGame() {
-      players.length = 0;
       assignedWords = {};
       impostors = [];
-      document.getElementById("playerList").innerHTML = "";
-      document.getElementById("playerName").value = "";
+      players.sort(() => Math.random() - 0.5);
+      displayPlayers();
       document.getElementById("categorySelect").value = "";
       document.getElementById("impostorCount").value = 1;
     }
