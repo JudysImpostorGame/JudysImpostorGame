@@ -43,23 +43,24 @@
       display: none;
       position: absolute;
       background-color: #fff;
-      min-width: 300px;
+      min-width: 220px;
       border: 2px solid #0288d1;
       border-radius: 10px;
       padding: 10px;
       z-index: 1;
       max-height: 300px;
       overflow-y: auto;
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 5px 15px;
       text-align: left;
     }
     .category-dropdown.open .dropdown-content {
-      display: grid;
+      display: block;
     }
     .dropdown-content label {
-      font-size: 0.9em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 5px 0;
+      font-size: 0.95em;
     }
     input, button, select {
       padding: 10px;
@@ -134,21 +135,21 @@
       <input type="number" id="impostorCount" min="1" value="1">
       <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
     </div>
-    <div class="category-dropdown" onclick="toggleDropdown(this)">
-      <button style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorien auswählen</button>
+    <div class="category-dropdown">
+      <button id="toggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorien auswählen</button>
       <div class="dropdown-content" id="categoryOptions">
-        <label><input type="checkbox" class="cat-check" value="Alle"> Alle</label>
-        <label><input type="checkbox" class="cat-check" value="Berufe"> Berufe</label>
-        <label><input type="checkbox" class="cat-check" value="Tiere"> Tiere</label>
-        <label><input type="checkbox" class="cat-check" value="Länder/Städte"> Länder/Städte</label>
-        <label><input type="checkbox" class="cat-check" value="Essen & Trinken"> Essen & Trinken</label>
-        <label><input type="checkbox" class="cat-check" value="Filme oder Serien"> Filme oder Serien</label>
-        <label><input type="checkbox" class="cat-check" value="Sportarten"> Sportarten</label>
-        <label><input type="checkbox" class="cat-check" value="Kampfsportler"> Kampfsportler</label>
-        <label><input type="checkbox" class="cat-check" value="Fußballer"> Fußballer</label>
-        <label><input type="checkbox" class="cat-check" value="Hobbys"> Hobbys</label>
-        <label><input type="checkbox" class="cat-check" value="Videospiele"> Videospiele</label>
-        <label><input type="checkbox" class="cat-check" value="Apps"> Apps</label>
+        <label>Alle <input type="checkbox" id="selectAll"></label>
+        <label>Berufe <input type="checkbox" class="cat-check" value="Berufe"></label>
+        <label>Tiere <input type="checkbox" class="cat-check" value="Tiere"></label>
+        <label>Länder/Städte <input type="checkbox" class="cat-check" value="Länder/Städte"></label>
+        <label>Essen & Trinken <input type="checkbox" class="cat-check" value="Essen & Trinken"></label>
+        <label>Filme oder Serien <input type="checkbox" class="cat-check" value="Filme oder Serien"></label>
+        <label>Sportarten <input type="checkbox" class="cat-check" value="Sportarten"></label>
+        <label>Kampfsportler <input type="checkbox" class="cat-check" value="Kampfsportler"></label>
+        <label>Fußballer <input type="checkbox" class="cat-check" value="Fußballer"></label>
+        <label>Hobbys <input type="checkbox" class="cat-check" value="Hobbys"></label>
+        <label>Videospiele <input type="checkbox" class="cat-check" value="Videospiele"></label>
+        <label>Apps <input type="checkbox" class="cat-check" value="Apps"></label>
       </div>
     </div>
   </div>
@@ -163,7 +164,6 @@
   <script>
     const players = [];
     const categories = {
-      "Alle": [],
       "Berufe": [],
       "Tiere": [],
       "Länder/Städte": [],
@@ -181,9 +181,23 @@
     let impostors = [];
     let gameStarted = false;
 
-    function toggleDropdown(el) {
-      el.classList.toggle("open");
-    }
+    document.getElementById("toggleCategoryButton").addEventListener("click", function (e) {
+      e.stopPropagation();
+      const dropdown = this.parentElement;
+      dropdown.classList.toggle("open");
+    });
+
+    document.addEventListener("click", function (e) {
+      const dropdown = document.querySelector(".category-dropdown");
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove("open");
+      }
+    });
+
+    document.getElementById("selectAll").addEventListener("change", function () {
+      const checks = document.querySelectorAll(".cat-check");
+      checks.forEach(cb => cb.checked = this.checked);
+    });
 
     function getSelectedCategories() {
       const checks = document.querySelectorAll(".cat-check:checked");
