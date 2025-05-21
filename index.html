@@ -2,144 +2,120 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>🎭 Finde den Betrüger</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+  <title>Finde den Impostor</title>
   <style>
     body {
-      font-family: 'Fredoka', sans-serif;
-      background: linear-gradient(to bottom, #dff6fd, #ffffff);
-      color: #004d80;
-      margin: 0;
-      padding: 20px;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to bottom right, #b3e5fc, #e1f5fe);
       text-align: center;
+      padding: 20px;
     }
-
     h1 {
-      font-size: 2.8em;
-      color: #0277bd;
-      margin-bottom: 10px;
+      font-size: 2.5em;
+      color: #0288d1;
     }
-
-    .box {
-      background: white;
-      border: 3px dashed #81d4fa;
-      border-radius: 20px;
-      padding: 30px;
-      max-width: 650px;
-      margin: auto;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    textarea {
-      width: 90%;
-      padding: 12px;
-      font-size: 1em;
+    input, button {
+      padding: 10px;
+      margin: 5px;
       border-radius: 10px;
-      border: 2px solid #81d4fa;
-      margin-top: 10px;
-      resize: none;
-      font-family: 'Fredoka', sans-serif;
-    }
-
-    button {
-      background-color: #0288d1;
-      color: white;
+      border: 2px solid #0288d1;
       font-size: 1em;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 12px;
-      margin: 10px;
-      cursor: pointer;
-      transition: 0.2s ease;
-      font-family: 'Fredoka', sans-serif;
     }
-
-    button:hover {
-      background-color: #0277bd;
-      transform: scale(1.05);
-    }
-
-    .spieler-buttons {
+    .player-list {
       display: flex;
       flex-wrap: wrap;
       justify-content: center;
+      gap: 10px;
       margin-top: 20px;
     }
-
-    .spieler-buttons button {
-      margin: 8px;
-      min-width: 120px;
+    .player-list button {
+      background-color: white;
+      cursor: pointer;
+      padding: 10px 15px;
+      border-radius: 10px;
+      border: 2px solid #0288d1;
+      font-size: 1em;
     }
-
-    .info {
-      font-size: 1.1em;
-      margin-top: 15px;
-      color: #006064;
-    }
-
-    @media (max-width: 600px) {
-      .spieler-buttons button {
-        min-width: 100%;
-      }
+    .word-box {
+      padding: 10px 15px;
+      background-color: #ffffff;
+      border: 2px solid #00796b;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #00796b;
     }
   </style>
 </head>
 <body>
-  <h1>🎭 Finde den Betrüger!</h1>
-  <div class="box">
-    <p><strong>Gib die Spielernamen ein (jeweils eine Zeile):</strong></p>
-    <textarea id="playerNames" rows="6" placeholder="z. B. Felix&#10;Judy&#10;Ali"></textarea><br>
-    <button onclick="startGame()">🎮 Spiel starten</button>
-    <div id="result"></div>
-  </div>
+  <h1>Finde den Impostor</h1>
+  <input type="text" id="playerName" placeholder="Dein Name">
+  <button onclick="addPlayer()">Hinzufügen</button>
+  <button onclick="startGame()">Start</button>
+  <div class="player-list" id="playerList"></div>
 
   <script>
-    const woerter = [
-      "Ronaldo", "Messi", "Burger", "Currywurst", "Harry Potter", "Pommes", "Star Wars", "Titanic", "Avengers", "Schumacher",
-      "Pizza", "Katze", "Hund", "Auto", "Kamera", "Döner", "Salat", "Eis", "Kuchen", "Nudeln", "Basketball", "Tennis", "Fußball",
-      "Berlin", "Tokio", "New York", "München", "Rom", "Boxen", "Skifahren", "Volleyball", "Turnen", "Feuerwehrmann",
-      "Capital Bra", "Bushido", "Helene Fischer", "Apache 207", "Günther Jauch", "Pilot", "Arzt", "Lehrer", "Ingenieur",
-      "Tisch", "Stuhl", "Computer", "Buch", "Lampe", "Shrek", "Frozen", "Minions"
-    ];
+    const players = [];
 
-    // Auffüllen auf 1000+ Wörter
-    while (woerter.length < 1000) {
-      const wort = woerter[Math.floor(Math.random() * woerter.length)] + Math.floor(Math.random() * 9999);
-      if (!woerter.includes(wort)) woerter.push(wort);
-    }
+    const categories = {
+      Sportarten: ["Basketball", "Tennis", "Skifahren", "Boxen", "Schwimmen", "Judo", "Handball", "Volleyball", "Fußball", "Rugby", "Eishockey", "Klettern", "Baseball", "Turnen", "Fechten", "Golf"],
+      Politiker: ["Angela Merkel", "Barack Obama", "Donald Trump", "Winston Churchill", "Emmanuel Macron", "Olaf Scholz", "Ursula von der Leyen", "Wladimir Putin"],
+      Sänger: ["Rihanna", "Michael Jackson", "Adele", "Beyoncé", "Ed Sheeran", "Shakira", "Helene Fischer", "Lena Meyer-Landrut"],
+      Schauspieler: ["Leonardo DiCaprio", "Brad Pitt", "Angelina Jolie", "Emma Watson", "Will Smith", "Keanu Reeves", "Tom Hanks", "Johnny Depp"],
+      Länder: ["Deutschland", "Frankreich", "Italien", "Japan", "Kanada", "Brasilien", "Ägypten", "Südafrika", "Australien", "Indien", "China"],
+      Tiere: ["Hund", "Katze", "Löwe", "Tiger", "Elefant", "Panda", "Adler", "Känguru", "Delfin", "Biene"],
+      Essen: ["Pizza", "Sushi", "Spaghetti", "Pommes", "Burger", "Salat", "Käse", "Schokolade", "Wurst", "Croissant"],
+      Berufe: ["Arzt", "Lehrer", "Polizist", "Ingenieur", "Schauspieler", "Musiker", "Pilot", "Bäcker", "Friseur", "Bauarbeiter"],
+      Marken: ["Nike", "Adidas", "Apple", "Samsung", "Coca-Cola", "BMW", "Mercedes", "Google", "Amazon", "Zara"],
+      Promis: ["Cristiano Ronaldo", "Lionel Messi", "Elon Musk", "Pablo Picasso", "Serena Williams", "Usain Bolt", "Roger Federer", "Mark Zuckerberg"]
+    };
 
-    let selectedWord = "";
-    let betruegerIndex = -1;
-    let players = [];
+    const wordPool = Object.values(categories).flat();
+    let assignedWords = {};
+    let impostors = [];
 
-    function startGame() {
-      const input = document.getElementById("playerNames").value.trim();
-      if (!input) return alert("Bitte gib mindestens 3 Spielernamen ein.");
-      players = input.split("\n").map(n => n.trim()).filter(n => n);
-      if (players.length < 3) return alert("Mindestens 3 Spieler erforderlich.");
-
-      selectedWord = woerter[Math.floor(Math.random() * woerter.length)];
-      betruegerIndex = Math.floor(Math.random() * players.length);
-
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "<p><strong>Klicke auf deinen Namen, um deine geheime Rolle zu sehen:</strong></p><div class='spieler-buttons'></div>";
-      const buttonsDiv = resultDiv.querySelector(".spieler-buttons");
-
-      players.forEach((name, i) => {
+    function addPlayer() {
+      const name = document.getElementById("playerName").value.trim();
+      if (name && !players.includes(name)) {
+        players.push(name);
         const btn = document.createElement("button");
         btn.textContent = name;
-        btn.onclick = function () {
-          const message = i === betruegerIndex
-            ? "❌ Du bist der Betrüger! Versuche herauszufinden, welches Wort die anderen haben."
-            : "✅ Dein Wort ist: " + selectedWord;
-          alert(message);
-          btn.disabled = true;
-        };
-        buttonsDiv.appendChild(btn);
-      });
+        btn.onclick = () => revealWord(name, btn);
+        document.getElementById("playerList").appendChild(btn);
+        document.getElementById("playerName").value = "";
+      }
+    }
 
-      resultDiv.innerHTML += "<div class='info'>👥 Nachdem jeder geklickt hat, beschreibt das Wort – dann stimmt ab, wer der Betrüger ist!</div>";
+    function startGame() {
+      if (players.length < 3) {
+        alert("Mindestens 3 Spieler erforderlich.");
+        return;
+      }
+
+      assignedWords = {};
+      impostors = [];
+
+      const totalImpostors = Math.max(1, Math.floor(players.length / 4));
+      const selectedWord = wordPool[Math.floor(Math.random() * wordPool.length)];
+      const shuffled = [...players].sort(() => Math.random() - 0.5);
+
+      impostors = shuffled.slice(0, totalImpostors);
+
+      for (const name of players) {
+        assignedWords[name] = impostors.includes(name) ? "IMPOSTOR" : selectedWord;
+      }
+
+      alert("Wörter wurden verteilt! Klicke auf deinen Namen, um dein Wort zu sehen.");
+    }
+
+    function revealWord(name, button) {
+      if (assignedWords[name]) {
+        const wordBox = document.createElement("div");
+        wordBox.className = "word-box";
+        wordBox.textContent = assignedWords[name];
+        button.replaceWith(wordBox);
+      }
     }
   </script>
 </body>
