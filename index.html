@@ -23,9 +23,8 @@
       gap: 10px;
       align-items: center;
       margin-bottom: 10px;
-      flex-direction: row;
     }
-    .controls-top input, .controls-top button, .controls-top label, .controls-top select {
+    .controls-top input, .controls-top button, .controls-top label {
       font-size: 1.1em;
       min-width: 120px;
     }
@@ -35,6 +34,31 @@
     }
     .controls-bottom {
       margin-bottom: 20px;
+    }
+    .category-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #fff;
+      min-width: 200px;
+      border: 2px solid #0288d1;
+      border-radius: 10px;
+      text-align: left;
+      padding: 10px;
+      z-index: 1;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .dropdown-content label {
+      display: block;
+      margin: 5px 0;
+      font-size: 0.9em;
+    }
+    .category-dropdown:hover .dropdown-content {
+      display: block;
     }
     input, button, select {
       padding: 10px;
@@ -96,10 +120,6 @@
         flex-direction: column;
         gap: 8px;
       }
-      .controls-top input, .controls-top button, .controls-top label, .controls-top select {
-        width: 90%;
-        font-size: 1.2em;
-      }
     }
   </style>
 </head>
@@ -113,9 +133,23 @@
       <input type="number" id="impostorCount" min="1" value="1">
       <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
     </div>
-    <select id="categorySelect">
-      <option value="">Kategorie wählen</option>
-    </select>
+    <div class="category-dropdown">
+      <button style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorien auswählen</button>
+      <div class="dropdown-content" id="categoryOptions">
+        <label><input type="checkbox" class="cat-check" value="Alle"> Alle</label>
+        <label><input type="checkbox" class="cat-check" value="Berufe"> Berufe</label>
+        <label><input type="checkbox" class="cat-check" value="Tiere"> Tiere</label>
+        <label><input type="checkbox" class="cat-check" value="Länder/Städte"> Länder/Städte</label>
+        <label><input type="checkbox" class="cat-check" value="Essen & Trinken"> Essen & Trinken</label>
+        <label><input type="checkbox" class="cat-check" value="Filme oder Serien"> Filme oder Serien</label>
+        <label><input type="checkbox" class="cat-check" value="Sportarten"> Sportarten</label>
+        <label><input type="checkbox" class="cat-check" value="Kampfsportler"> Kampfsportler</label>
+        <label><input type="checkbox" class="cat-check" value="Fußballer"> Fußballer</label>
+        <label><input type="checkbox" class="cat-check" value="Hobbys"> Hobbys</label>
+        <label><input type="checkbox" class="cat-check" value="Videospiele"> Videospiele</label>
+        <label><input type="checkbox" class="cat-check" value="Apps"> Apps</label>
+      </div>
+    </div>
   </div>
 
   <div class="controls-bottom">
@@ -128,33 +162,30 @@
   <script>
     const players = [];
     const categories = {
-      Sportarten: ["Basketball", "Tennis", "Skifahren", "Boxen", "Schwimmen", "Judo", "Handball", "Volleyball", "Fußball", "Rugby", "Eishockey", "Klettern", "Baseball", "Turnen", "Fechten", "Golf", "Surfen", "Snowboarden"],
-      Politiker: ["Angela Merkel", "Barack Obama", "Donald Trump", "Winston Churchill", "Emmanuel Macron", "Olaf Scholz", "Ursula von der Leyen", "Wladimir Putin", "Joe Biden", "Nelson Mandela", "Xi Jinping"],
-      Sänger: ["Rihanna", "Michael Jackson", "Adele", "Beyoncé", "Ed Sheeran", "Shakira", "Helene Fischer", "Lena Meyer-Landrut", "Justin Bieber", "The Weeknd", "Taylor Swift"],
-      Schauspieler: ["Leonardo DiCaprio", "Brad Pitt", "Angelina Jolie", "Emma Watson", "Will Smith", "Keanu Reeves", "Tom Hanks", "Johnny Depp", "Jennifer Lawrence", "Dwayne Johnson"],
-      Länder: ["Deutschland", "Frankreich", "Italien", "Japan", "Kanada", "Brasilien", "Ägypten", "Südafrika", "Australien", "Indien", "China", "USA", "Mexiko", "Spanien"],
-      Tiere: ["Hund", "Katze", "Löwe", "Tiger", "Elefant", "Panda", "Adler", "Känguru", "Delfin", "Biene", "Giraffe", "Zebra", "Krokodil"],
-      Essen: ["Pizza", "Sushi", "Spaghetti", "Pommes", "Burger", "Salat", "Käse", "Schokolade", "Wurst", "Croissant", "Torte", "Lasagne", "Pfannkuchen"],
-      Berufe: ["Arzt", "Lehrer", "Polizist", "Ingenieur", "Schauspieler", "Musiker", "Pilot", "Bäcker", "Friseur", "Bauarbeiter", "Koch", "Verkäufer"],
-      Marken: ["Nike", "Adidas", "Apple", "Samsung", "Coca-Cola", "BMW", "Mercedes", "Google", "Amazon", "Zara", "Lidl", "Netflix", "IKEA"],
-      Promis: ["Cristiano Ronaldo", "Lionel Messi", "Elon Musk", "Pablo Picasso", "Serena Williams", "Usain Bolt", "Roger Federer", "Mark Zuckerberg", "Kanye West"],
-      Boxer: ["Muhammad Ali", "Mike Tyson", "Floyd Mayweather", "Wladimir Klitschko", "Conor McGregor"],
-      Fußballer: ["Lionel Messi", "Cristiano Ronaldo", "Kylian Mbappé", "Robert Lewandowski", "Neymar", "Erling Haaland", "Manuel Neuer"]
+      "Alle": [],
+      "Berufe": [],
+      "Tiere": [],
+      "Länder/Städte": [],
+      "Essen & Trinken": [],
+      "Filme oder Serien": [],
+      "Sportarten": [],
+      "Kampfsportler": [],
+      "Fußballer": [],
+      "Hobbys": [],
+      "Videospiele": [],
+      "Apps": []
     };
-
-    categories.Alle = Object.values(categories).flat();
 
     let assignedWords = {};
     let impostors = [];
     let gameStarted = false;
 
-    const categorySelect = document.getElementById("categorySelect");
-    Object.keys(categories).forEach(cat => {
-      const option = document.createElement("option");
-      option.value = cat;
-      option.textContent = cat;
-      categorySelect.appendChild(option);
-    });
+    function getSelectedCategories() {
+      const checks = document.querySelectorAll(".cat-check:checked");
+      let words = [];
+      checks.forEach(cb => words = words.concat(categories[cb.value] || []));
+      return words;
+    }
 
     function addPlayer() {
       const name = document.getElementById("playerName").value.trim();
@@ -201,15 +232,15 @@
     }
 
     function startGame() {
-      const category = categorySelect.value;
       const impostorCount = parseInt(document.getElementById("impostorCount").value);
+      const wordPool = getSelectedCategories();
 
       if (players.length < 3) {
         alert("Mindestens 3 Spieler erforderlich.");
         return;
       }
-      if (!category) {
-        alert("Bitte wähle eine Kategorie.");
+      if (wordPool.length === 0) {
+        alert("Bitte mindestens eine Kategorie auswählen.");
         return;
       }
       if (impostorCount >= players.length) {
@@ -221,7 +252,7 @@
       impostors = [];
       gameStarted = true;
 
-      const selectedWord = categories[category][Math.floor(Math.random() * categories[category].length)];
+      const selectedWord = wordPool[Math.floor(Math.random() * wordPool.length)];
       const shuffled = [...players].sort(() => Math.random() - 0.5);
       impostors = shuffled.slice(0, impostorCount);
 
