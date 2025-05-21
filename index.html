@@ -43,22 +43,23 @@
       display: none;
       position: absolute;
       background-color: #fff;
-      min-width: 200px;
+      min-width: 300px;
       border: 2px solid #0288d1;
       border-radius: 10px;
-      text-align: left;
       padding: 10px;
       z-index: 1;
       max-height: 300px;
       overflow-y: auto;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 5px 15px;
+      text-align: left;
+    }
+    .category-dropdown.open .dropdown-content {
+      display: grid;
     }
     .dropdown-content label {
-      display: block;
-      margin: 5px 0;
       font-size: 0.9em;
-    }
-    .category-dropdown:hover .dropdown-content {
-      display: block;
     }
     input, button, select {
       padding: 10px;
@@ -133,7 +134,7 @@
       <input type="number" id="impostorCount" min="1" value="1">
       <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
     </div>
-    <div class="category-dropdown">
+    <div class="category-dropdown" onclick="toggleDropdown(this)">
       <button style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorien auswählen</button>
       <div class="dropdown-content" id="categoryOptions">
         <label><input type="checkbox" class="cat-check" value="Alle"> Alle</label>
@@ -179,6 +180,10 @@
     let assignedWords = {};
     let impostors = [];
     let gameStarted = false;
+
+    function toggleDropdown(el) {
+      el.classList.toggle("open");
+    }
 
     function getSelectedCategories() {
       const checks = document.querySelectorAll(".cat-check:checked");
