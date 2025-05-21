@@ -7,26 +7,28 @@
   <style>
     body {
       font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: linear-gradient(to right, #ffdde1, #ee9ca7);
+      background: linear-gradient(to bottom, #e0f7fa, #ffffff);
       margin: 0;
       padding: 20px;
       text-align: center;
+      color: #004d80;
     }
 
     h1 {
-      color: #6a1b9a;
-      font-size: 2.5em;
+      color: #0277bd;
+      font-size: 2.8em;
       margin-bottom: 20px;
-      text-shadow: 1px 1px #fff;
+      text-shadow: 1px 1px #ffffff;
     }
 
     .box {
-      background: #fff;
-      padding: 25px;
+      background: #ffffff;
+      border: 3px dashed #81d4fa;
       border-radius: 20px;
+      padding: 25px;
       max-width: 600px;
       margin: auto;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     }
 
     textarea {
@@ -34,13 +36,13 @@
       padding: 10px;
       font-size: 1em;
       border-radius: 10px;
-      border: none;
-      margin: 10px 0;
+      border: 2px solid #81d4fa;
+      margin-top: 10px;
       resize: none;
     }
 
     button {
-      background-color: #8e44ad;
+      background-color: #0288d1;
       color: white;
       font-size: 1em;
       border: none;
@@ -48,11 +50,12 @@
       border-radius: 12px;
       margin: 10px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: 0.2s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     button:hover {
-      background-color: #732d91;
+      background-color: #0277bd;
       transform: scale(1.05);
     }
 
@@ -66,6 +69,12 @@
     .spieler-buttons button {
       margin: 8px;
       min-width: 120px;
+    }
+
+    .info {
+      font-size: 1.1em;
+      color: #006064;
+      margin-top: 15px;
     }
 
     @media (max-width: 600px) {
@@ -97,7 +106,7 @@
       "Pizza", "Burger", "Sushi", "Nudeln", "Salat", "Eis", "Döner", "Currywurst", "Pommes", "Kuchen"
     ];
 
-    // auf 1000+ auffüllen
+    // Liste auf 1000+ erweitern
     while (woerter.length < 1000) {
       let wort = woerter[Math.floor(Math.random() * 100)] + Math.floor(Math.random() * 9999);
       if (!woerter.includes(wort)) woerter.push(wort);
@@ -105,29 +114,32 @@
 
     function startGame() {
       const input = document.getElementById("playerNames").value.trim();
-      if (!input) return alert("Bitte gib mindestens 3 Spielernamen ein.");
+      if (!input) return alert("Bitte gib Spielernamen ein.");
       const names = input.split("\n").map(n => n.trim()).filter(n => n);
-      if (names.length < 3) return alert("Mindestens 3 Spieler werden benötigt.");
+      if (names.length < 3) return alert("Mindestens 3 Spieler nötig.");
 
-      const word = woerter[Math.floor(Math.random() * woerter.length)];
-      const betruegerIndex = Math.floor(Math.random() * names.length);
+      const chosenWord = woerter[Math.floor(Math.random() * woerter.length)];
+      const impostor = Math.floor(Math.random() * names.length);
       const shuffled = [...names].sort(() => Math.random() - 0.5);
 
       const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "<p>Klicke auf deinen Namen, um dein Wort zu sehen (geheim!):</p><div class='spieler-buttons'></div>";
-      const buttonContainer = resultDiv.querySelector('.spieler-buttons');
+      resultDiv.innerHTML = "<p><strong>Klicke auf deinen Namen, um deine Rolle zu sehen:</strong></p><div class='spieler-buttons'></div>";
+      const buttonGroup = resultDiv.querySelector(".spieler-buttons");
 
       shuffled.forEach((name, i) => {
         const btn = document.createElement("button");
-        btn.innerText = name;
+        btn.textContent = name;
         btn.onclick = () => {
-          alert(i === betruegerIndex ? "❌ Du bist der Betrüger! Versuche, das Wort zu erraten." : "✅ Dein Wort ist: " + word);
+          const message = i === impostor
+            ? "❌ Du bist der Betrüger! Versuche, das geheime Wort herauszufinden."
+            : "✅ Dein Wort ist: " + chosenWord;
+          alert(message);
           btn.disabled = true;
         };
-        buttonContainer.appendChild(btn);
+        buttonGroup.appendChild(btn);
       });
 
-      resultDiv.innerHTML += "<p style='margin-top: 15px;'>🔍 Beschreibt das Wort nacheinander – dann wird abgestimmt!</p>";
+      resultDiv.innerHTML += "<div class='info'>👥 Nachdem jeder geklickt hat, beschreibt das Wort und findet den Betrüger!</div>";
     }
   </script>
 </body>
