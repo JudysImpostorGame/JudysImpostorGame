@@ -69,7 +69,7 @@
 
     .spieler-buttons button {
       margin: 8px;
-      min-width: 110px;
+      min-width: 120px;
     }
 
     .info {
@@ -103,40 +103,43 @@
       "Tisch", "Stuhl", "Computer", "Buch", "Lampe", "Shrek", "Frozen", "Minions"
     ];
 
+    // Auffüllen auf 1000+ Wörter
     while (woerter.length < 1000) {
       const wort = woerter[Math.floor(Math.random() * woerter.length)] + Math.floor(Math.random() * 9999);
       if (!woerter.includes(wort)) woerter.push(wort);
     }
 
+    let selectedWord = "";
+    let betruegerIndex = -1;
+    let players = [];
+
     function startGame() {
       const input = document.getElementById("playerNames").value.trim();
       if (!input) return alert("Bitte gib mindestens 3 Spielernamen ein.");
-      const names = input.split("\n").map(n => n.trim()).filter(n => n);
-      if (names.length < 3) return alert("Mindestens 3 Spieler erforderlich.");
+      players = input.split("\n").map(n => n.trim()).filter(n => n);
+      if (players.length < 3) return alert("Mindestens 3 Spieler erforderlich.");
 
-      const geheimWort = woerter[Math.floor(Math.random() * woerter.length)];
-      const betrueger = Math.floor(Math.random() * names.length);
-      const gemischt = [...names].sort(() => Math.random() - 0.5);
+      selectedWord = woerter[Math.floor(Math.random() * woerter.length)];
+      betruegerIndex = Math.floor(Math.random() * players.length);
 
-      const result = document.getElementById("result");
-      result.innerHTML = "<p><strong>Klicke auf deinen Namen, um deine geheime Rolle zu sehen:</strong></p><div class='spieler-buttons'></div>";
-      const buttonsDiv = result.querySelector(".spieler-buttons");
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "<p><strong>Klicke auf deinen Namen, um deine geheime Rolle zu sehen:</strong></p><div class='spieler-buttons'></div>";
+      const buttonsDiv = resultDiv.querySelector(".spieler-buttons");
 
-      gemischt.forEach((name, i) => {
+      players.forEach((name, i) => {
         const btn = document.createElement("button");
         btn.textContent = name;
         btn.onclick = function () {
-          if (i === betrueger) {
-            alert("❌ Du bist der Betrüger!\nVersuche herauszufinden, welches Wort die anderen Spieler bekommen haben.");
-          } else {
-            alert("✅ Dein Wort ist: " + geheimWort);
-          }
+          const message = i === betruegerIndex
+            ? "❌ Du bist der Betrüger! Versuche herauszufinden, welches Wort die anderen haben."
+            : "✅ Dein Wort ist: " + selectedWord;
+          alert(message);
           btn.disabled = true;
         };
         buttonsDiv.appendChild(btn);
       });
 
-      result.innerHTML += "<div class='info'>👥 Nachdem jeder geklickt hat, beschreibt das Wort – dann stimmt ab, wer der Betrüger ist!</div>";
+      resultDiv.innerHTML += "<div class='info'>👥 Nachdem jeder geklickt hat, beschreibt das Wort – dann stimmt ab, wer der Betrüger ist!</div>";
     }
   </script>
 </body>
