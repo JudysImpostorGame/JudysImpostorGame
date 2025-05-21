@@ -6,27 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: 'Comic Sans MS', cursive;
       background: linear-gradient(to bottom, #e0f7fa, #ffffff);
+      color: #004d80;
       margin: 0;
       padding: 20px;
       text-align: center;
-      color: #004d80;
     }
 
     h1 {
       color: #0277bd;
-      font-size: 2.8em;
-      margin-bottom: 20px;
-      text-shadow: 1px 1px #ffffff;
+      font-size: 2.5em;
+      text-shadow: 1px 1px white;
     }
 
     .box {
-      background: #ffffff;
+      background: white;
       border: 3px dashed #81d4fa;
       border-radius: 20px;
       padding: 25px;
-      max-width: 600px;
+      max-width: 650px;
       margin: auto;
       box-shadow: 0 6px 15px rgba(0,0,0,0.1);
     }
@@ -72,22 +71,22 @@
     }
 
     .info {
+      margin-top: 15px;
       font-size: 1.1em;
       color: #006064;
-      margin-top: 15px;
     }
 
     @media (max-width: 600px) {
       .spieler-buttons button {
-        min-width: 100%;
+        min-width: 90%;
       }
     }
   </style>
 </head>
 <body>
-  <h1>🎭 Finde den Betrüger!</h1>
+  <h1>🎭 Finde den Betrüger</h1>
   <div class="box">
-    <p>Gib die Spielernamen ein (ein Name pro Zeile):</p>
+    <p>Gib die Namen der Spieler ein (jeweils eine Zeile):</p>
     <textarea id="playerNames" rows="6" placeholder="z. B. Felix&#10;Judy&#10;Ali"></textarea><br>
     <button onclick="startGame()">Spiel starten</button>
     <div id="result"></div>
@@ -95,51 +94,43 @@
 
   <script>
     const woerter = [
-      "Löwe", "Tiger", "Elefant", "Giraffe", "Pinguin", "Zebra", "Hund", "Katze", "Pferd", "Schlange",
-      "Berlin", "Paris", "New York", "London", "Tokio", "München", "Köln", "Hamburg", "Barcelona", "Rom",
-      "Fußball", "Basketball", "Tennis", "Schwimmen", "Volleyball", "Boxen", "Eishockey", "Skifahren", "Rudern", "Turnen",
-      "Arzt", "Lehrer", "Polizist", "Feuerwehrmann", "Ingenieur", "Koch", "Bäcker", "Pilot", "Journalist", "Schauspieler",
-      "Tisch", "Stuhl", "Auto", "Fahrrad", "Fernseher", "Lampe", "Computer", "Telefon", "Buch", "Kamera",
-      "Merkel", "Schumacher", "Beckenbauer", "Ronaldo", "Messi", "Helene Fischer", "Apache 207", "Capital Bra", "Günther Jauch", "Barbara Schöneberger",
-      "Harry Potter", "Titanic", "Avengers", "Star Wars", "Herr der Ringe", "Frozen", "Avatar", "Joker", "Shrek", "Minions",
-      "schnell", "lustig", "klug", "stark", "freundlich", "mutig", "witzig", "nett", "faul", "kreativ",
-      "Pizza", "Burger", "Sushi", "Nudeln", "Salat", "Eis", "Döner", "Currywurst", "Pommes", "Kuchen"
+      "Salat1598", "Frozen5942", "London4014", "nett6630", "Journalist2201", "Herr der Ringe8431", "Tokio7637", "kreativ8412", "Bushido8744", "Skifahren2842",
+      "Hund", "Currywurst5945", "Löwe4582", "Nudeln5750", "New York7085", "schnell2935", "Eishockey8879", "Tiger5619", "Helene Fischer7463", "Döner5119",
+      "Harry Potter9260", "Joker6695", "Kamera8346", "Lehrer5622", "Apache 2072797", "Handball7562", "Schumacher2056", "Frozen4183", "Tennis4849", "Lehrer",
+      "Buch6158", "Messi4376", "Burger804", "München8371", "Avengers6388", "Paris4600", "freundlich8055", "Zebra3887", "Minions5809", "Ronaldo7704",
+      "Basketball5087", "Feuerwehrmann8126", "Computer8533", "Star Wars1698", "Pommes", "Merkel8664", "Katze7520", "Shrek", "Avatar", "Pizza", 
+      "Auto", "Pilot", "Elefant", "Koch", "Kamera", "Capital Bra", "Lampe", "Stuhl", "Tisch", "Sushi", "Volleyball", "Turnen", "Polizist", "Ingenieur"
+      // (optional: weitere Wörter hinzufügen bis 1000+)
     ];
-
-    // Liste auf 1000+ erweitern
-    while (woerter.length < 1000) {
-      let wort = woerter[Math.floor(Math.random() * 100)] + Math.floor(Math.random() * 9999);
-      if (!woerter.includes(wort)) woerter.push(wort);
-    }
 
     function startGame() {
       const input = document.getElementById("playerNames").value.trim();
       if (!input) return alert("Bitte gib Spielernamen ein.");
       const names = input.split("\n").map(n => n.trim()).filter(n => n);
-      if (names.length < 3) return alert("Mindestens 3 Spieler nötig.");
+      if (names.length < 3) return alert("Mindestens 3 Spieler werden benötigt.");
 
-      const chosenWord = woerter[Math.floor(Math.random() * woerter.length)];
-      const impostor = Math.floor(Math.random() * names.length);
+      const wort = woerter[Math.floor(Math.random() * woerter.length)];
+      const betruegerIndex = Math.floor(Math.random() * names.length);
       const shuffled = [...names].sort(() => Math.random() - 0.5);
 
       const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = "<p><strong>Klicke auf deinen Namen, um deine Rolle zu sehen:</strong></p><div class='spieler-buttons'></div>";
-      const buttonGroup = resultDiv.querySelector(".spieler-buttons");
+      resultDiv.innerHTML = "<p><strong>Klicke auf deinen Namen, um deine geheime Rolle zu sehen:</strong></p><div class='spieler-buttons'></div>";
+      const container = resultDiv.querySelector(".spieler-buttons");
 
       shuffled.forEach((name, i) => {
         const btn = document.createElement("button");
         btn.textContent = name;
         btn.onclick = () => {
-          const message = i === impostor
-            ? "❌ Du bist der Betrüger! Versuche, das geheime Wort herauszufinden."
-            : "✅ Dein Wort ist: " + chosenWord;
+          const message = i === betruegerIndex
+            ? "❌ Du bist der Betrüger! Versuche herauszufinden, welches Wort die anderen haben."
+            : "✅ Dein Wort ist: " + wort;
           alert(message);
           btn.disabled = true;
         };
-        buttonGroup.appendChild(btn);
+        container.appendChild(btn);
       });
 
-      resultDiv.innerHTML += "<div class='info'>👥 Nachdem jeder geklickt hat, beschreibt das Wort und findet den Betrüger!</div>";
+      resultDiv.innerHTML += "<div class='info'>🔍 Beschreibt das Wort nacheinander – dann wird abgestimmt, wer der Betrüger ist!</div>";
     }
   </script>
 </body>
