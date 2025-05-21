@@ -36,6 +36,20 @@
       border-radius: 10px;
       border: 2px solid #0288d1;
       font-size: 1em;
+      position: relative;
+    }
+    .remove-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      cursor: pointer;
     }
     .word-box {
       padding: 10px 15px;
@@ -80,6 +94,7 @@
 
     let assignedWords = {};
     let impostors = [];
+    let gameStarted = false;
 
     const categorySelect = document.getElementById("categorySelect");
     Object.keys(categories).forEach(cat => {
@@ -98,14 +113,39 @@
       }
     }
 
+    function removePlayer(name) {
+      const index = players.indexOf(name);
+      if (index !== -1) {
+        players.splice(index, 1);
+        displayPlayers();
+      }
+    }
+
     function displayPlayers() {
       const playerList = document.getElementById("playerList");
       playerList.innerHTML = "";
       players.forEach(name => {
+        const container = document.createElement("div");
+        container.style.position = "relative";
         const btn = document.createElement("button");
         btn.textContent = name;
-        btn.onclick = () => revealWord(name, btn);
-        playerList.appendChild(btn);
+        btn.onclick = () => {
+          if (gameStarted) {
+            revealWord(name, btn);
+          }
+        };
+        container.appendChild(btn);
+        if (!gameStarted) {
+          const remove = document.createElement("button");
+          remove.textContent = "×";
+          remove.className = "remove-btn";
+          remove.onclick = (e) => {
+            e.stopPropagation();
+            removePlayer(name);
+          };
+          container.appendChild(remove);
+        }
+        playerList.appendChild(container);
       });
     }
 
@@ -128,6 +168,7 @@
 
       assignedWords = {};
       impostors = [];
+      gameStarted = true;
 
       const selectedWord = categories[category][Math.floor(Math.random() * categories[category].length)];
       const shuffled = [...players].sort(() => Math.random() - 0.5);
@@ -153,6 +194,7 @@
     function resetGame() {
       assignedWords = {};
       impostors = [];
+      gameStarted = false;
       players.sort(() => Math.random() - 0.5);
       displayPlayers();
       document.getElementById("impostorCount").value = 1;
