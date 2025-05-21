@@ -29,6 +29,10 @@
       font-size: 1.1em;
       min-width: 120px;
     }
+    #impostorCount {
+      width: 60px;
+      text-align: center;
+    }
     .controls-bottom {
       margin-bottom: 20px;
     }
@@ -60,18 +64,21 @@
     }
     .remove-btn {
       position: absolute;
-      top: -10px;
-      right: -10px;
-      background: red;
+      top: -12px;
+      right: -12px;
+      background: #ff0000;
       color: white;
       border: none;
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 16px;
+      width: 26px;
+      height: 26px;
+      font-size: 18px;
       font-weight: bold;
       cursor: pointer;
       font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .word-box {
       padding: 12px 20px;
@@ -102,8 +109,10 @@
   <div class="controls-top">
     <input type="text" id="playerName" placeholder="Dein Name">
     <button onclick="addPlayer()">Hinzufügen</button>
-    <label for="impostorCount">Impostors:</label>
-    <input type="number" id="impostorCount" min="1" value="1" style="width: 60px;">
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <input type="number" id="impostorCount" min="1" value="1">
+      <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
+    </div>
     <select id="categorySelect">
       <option value="">Kategorie wählen</option>
     </select>
