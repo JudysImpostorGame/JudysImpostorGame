@@ -15,7 +15,7 @@
       font-size: 2.5em;
       color: #0288d1;
     }
-    input, button {
+    input, button, select {
       padding: 10px;
       margin: 5px;
       border-radius: 10px;
@@ -52,12 +52,17 @@
   <h1>Finde den Impostor</h1>
   <input type="text" id="playerName" placeholder="Dein Name">
   <button onclick="addPlayer()">Hinzufügen</button>
+  <select id="categorySelect">
+    <option value="">Kategorie wählen</option>
+  </select>
+  <input type="number" id="impostorCount" min="1" value="1" style="width: 60px;">
+  <label for="impostorCount">Impostors</label>
   <button onclick="startGame()">Start</button>
+  <button onclick="resetGame()">Reset</button>
   <div class="player-list" id="playerList"></div>
 
   <script>
     const players = [];
-
     const categories = {
       Sportarten: ["Basketball", "Tennis", "Skifahren", "Boxen", "Schwimmen", "Judo", "Handball", "Volleyball", "Fußball", "Rugby", "Eishockey", "Klettern", "Baseball", "Turnen", "Fechten", "Golf"],
       Politiker: ["Angela Merkel", "Barack Obama", "Donald Trump", "Winston Churchill", "Emmanuel Macron", "Olaf Scholz", "Ursula von der Leyen", "Wladimir Putin"],
@@ -71,9 +76,16 @@
       Promis: ["Cristiano Ronaldo", "Lionel Messi", "Elon Musk", "Pablo Picasso", "Serena Williams", "Usain Bolt", "Roger Federer", "Mark Zuckerberg"]
     };
 
-    const wordPool = Object.values(categories).flat();
     let assignedWords = {};
     let impostors = [];
+
+    const categorySelect = document.getElementById("categorySelect");
+    Object.keys(categories).forEach(cat => {
+      const option = document.createElement("option");
+      option.value = cat;
+      option.textContent = cat;
+      categorySelect.appendChild(option);
+    });
 
     function addPlayer() {
       const name = document.getElementById("playerName").value.trim();
@@ -88,19 +100,28 @@
     }
 
     function startGame() {
+      const category = categorySelect.value;
+      const impostorCount = parseInt(document.getElementById("impostorCount").value);
+
       if (players.length < 3) {
         alert("Mindestens 3 Spieler erforderlich.");
+        return;
+      }
+      if (!category) {
+        alert("Bitte wähle eine Kategorie.");
+        return;
+      }
+      if (impostorCount >= players.length) {
+        alert("Impostor-Anzahl muss kleiner als Spieleranzahl sein.");
         return;
       }
 
       assignedWords = {};
       impostors = [];
 
-      const totalImpostors = Math.max(1, Math.floor(players.length / 4));
-      const selectedWord = wordPool[Math.floor(Math.random() * wordPool.length)];
+      const selectedWord = categories[category][Math.floor(Math.random() * categories[category].length)];
       const shuffled = [...players].sort(() => Math.random() - 0.5);
-
-      impostors = shuffled.slice(0, totalImpostors);
+      impostors = shuffled.slice(0, impostorCount);
 
       for (const name of players) {
         assignedWords[name] = impostors.includes(name) ? "IMPOSTOR" : selectedWord;
@@ -116,6 +137,16 @@
         wordBox.textContent = assignedWords[name];
         button.replaceWith(wordBox);
       }
+    }
+
+    function resetGame() {
+      players.length = 0;
+      assignedWords = {};
+      impostors = [];
+      document.getElementById("playerList").innerHTML = "";
+      document.getElementById("playerName").value = "";
+      document.getElementById("categorySelect").value = "";
+      document.getElementById("impostorCount").value = 1;
     }
   </script>
 </body>
