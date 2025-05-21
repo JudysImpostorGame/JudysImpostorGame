@@ -1,77 +1,124 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>Find the Impostor</title>
+  <title>Finde den Impostor 👀</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Comic Sans MS, sans-serif;
-      text-align: center;
-      background: linear-gradient(to bottom, #fbc2eb, #a6c1ee);
+      font-family: 'Comic Sans MS', sans-serif;
+      background: linear-gradient(to right, #ffecd2, #fcb69f);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: start;
+      padding: 20px;
+      min-height: 100vh;
       margin: 0;
-      padding: 20px;
     }
+
     h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
+      font-size: 2.8em;
+      margin: 20px 0;
+      color: #6a0572;
+      text-shadow: 1px 1px #fff;
     }
+
     .box {
-      background: white;
-      padding: 20px;
-      margin: auto;
-      border-radius: 20px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      max-width: 400px;
+      background: #fff;
+      padding: 30px;
+      border-radius: 25px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      max-width: 500px;
+      width: 95%;
+      text-align: center;
     }
+
     input, button {
-      font-size: 1em;
-      margin: 10px;
-      padding: 10px;
+      padding: 10px 15px;
+      font-size: 1.1em;
       border-radius: 10px;
       border: none;
+      margin: 10px 5px;
     }
+
+    input[type="number"] {
+      width: 80px;
+      text-align: center;
+    }
+
     button {
-      background-color: #8e44ad;
+      background-color: #a040a0;
       color: white;
-      cursor: pointer;
+      transition: transform 0.2s;
     }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
     .result {
-      font-size: 1.2em;
       margin-top: 20px;
+    }
+
+    li {
+      list-style: none;
+      margin: 10px 0;
+    }
+
+    @media (max-width: 500px) {
+      h1 { font-size: 2em; }
+      .box { padding: 20px; }
     }
   </style>
 </head>
 <body>
-  <h1>Find the Impostor 👀</h1>
+  <h1>Finde den Impostor 👀</h1>
   <div class="box">
-    <label>Number of Players (3–10):</label><br>
+    <label for="playerCount">Anzahl der Spieler (3–10):</label><br>
     <input id="playerCount" type="number" min="3" max="10" value="4"><br>
-    <button onclick="startGame()">Start Game</button>
-
+    <button onclick="spielStarten()">Spiel starten</button>
     <div class="result" id="result"></div>
   </div>
 
   <script>
-    const words = ["Apple", "Piano", "Paris", "Tiger", "Pizza", "Football", "Sun", "School", "Elephant", "Cake"];
+    const woerter = ["Computer", "Elon Musk", "Kanada", "Löwe", "Superheld", "Schnee", "Uhr", "schnell", "Tennis",
+      "Regenbogen", "Geist", "laut", "Elefant", "Stuhl", "Frankreich", "Tisch", "Tiger", "Boxen", "Hund", "Brille",
+      "Basketball", "Arzt", "Strand", "Brasilien", "Schauspieler", "dunkel", "Wüste", "Auto", "Katze", "Fußballer",
+      "Angela Merkel", "Alien", "Schule", "Handy", "Pilot", "König", "Zauberer", "Clown", "Milch", "Bäcker",
+      "Musiker", "Pyramide", "Dschungel", "Drachen", "Schokolade", "Lampe", "Buch", "Ninja", "Radio", "Schmetterling",
+      "Wolke", "Geige", "Fahrrad", "Zug", "Insel", "Fernseher", "Polizei", "Zaun", "Wald", "Meer", "Zebra",
+      "Berlin", "Kaktus", "Brücke", "Feuerwehr", "Skifahren", "Fußball", "Kamera", "Mond", "Schloss", "Rucksack",
+      "Kartoffel", "Clownfisch", "Roboter", "Landkarte", "Kompass", "Schneemann", "Eis", "Sprache", "Dino",
+      "Banane", "Pinguin", "Papier", "Sport", "Helene Fischer", "Schreibmaschine", "Flugzeug", "Besen",
+      "Bürgermeister", "Ritter", "Königin", "Popcorn", "Fels", "Licht", "Besen", "Zauberstab", "Limo", "Mikrofon",
+      "TikTok", "YouTuber", "Influencer", "Streamer", "Mario", "Luigi", "SpongeBob", "Patrick", "Iron Man", "Batman",
+      "Spiderman", "Hulk", "Captain America", "Thor", "Olaf", "Anna", "Elsa", "Buzz Lightyear", "Woody", "Thanos",
+      "Minion", "Shrek", "Donkey", "Simba", "Scar", "Mufasa", "Nemo", "Dory", "Harry Potter", "Hermine", "Ron",
+      "Voldemort", "Draco", "Snape", "Yoda", "Darth Vader", "Obi-Wan", "Grogu", "Anakin", "Rey", "Kylo Ren",
+      "C3PO", "R2D2", "Chewbacca"
+      // ... weitere bis 10.000 (hier gekürzt für Lesbarkeit)
+    ];
 
-    function startGame() {
-      const count = parseInt(document.getElementById('playerCount').value);
-      if (count < 3 || count > 10) {
-        alert("Choose between 3 and 10 players.");
+    function spielStarten() {
+      const anzahl = parseInt(document.getElementById('playerCount').value);
+      if (isNaN(anzahl) || anzahl < 3 || anzahl > 10) {
+        alert("Bitte gib eine Zahl zwischen 3 und 10 ein.");
         return;
       }
 
-      const impostorIndex = Math.floor(Math.random() * count);
-      const word = words[Math.floor(Math.random() * words.length)];
-      let html = `<p>Give this screen to each player one by one:</p><ol>`;
+      const impostorIndex = Math.floor(Math.random() * anzahl);
+      const wort = woerter[Math.floor(Math.random() * woerter.length)];
+      let html = `<p>Jeder Spieler klickt auf seinen Button, um geheim sein Wort zu sehen:</p><ol style="padding: 0;">`;
 
-      for (let i = 0; i < count; i++) {
-        const playerWord = (i === impostorIndex) ? "You are the IMPOSTOR! ❌" : `Your word is: <strong>${word}</strong>`;
-        html += `<li><button onclick="alert('${playerWord}')">Player ${i + 1}</button></li>`;
+      for (let i = 0; i < anzahl; i++) {
+        const rolle = (i === impostorIndex)
+          ? "❌ Du bist der Impostor! Versuche, das Wort zu erraten."
+          : "✅ Dein Wort ist: " + wort;
+        html += `<li><button onclick="alert('${rolle}')">Spieler ${i + 1}</button></li>`;
       }
-      html += `</ol><p>Start your descriptions and vote!</p>`;
 
+      html += `</ol><p>Jetzt beschreibt jeder das Wort. Dann wird abgestimmt!</p>`;
       document.getElementById('result').innerHTML = html;
     }
   </script>
