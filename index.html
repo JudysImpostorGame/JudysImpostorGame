@@ -6,7 +6,7 @@
   <title>Finde den Impostor</title>
   <style>
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
+      font-family: Arial, sans-serif;
       background: linear-gradient(to bottom right, #b3e5fc, #e1f5fe);
       text-align: center;
       padding: 20px;
@@ -21,6 +21,7 @@
       border-radius: 10px;
       border: 2px solid #0288d1;
       font-size: 1em;
+      font-family: inherit;
     }
     .player-list {
       display: flex;
@@ -29,6 +30,9 @@
       gap: 10px;
       margin-top: 20px;
     }
+    .player-list > div {
+      position: relative;
+    }
     .player-list button {
       background-color: white;
       cursor: pointer;
@@ -36,7 +40,7 @@
       border-radius: 10px;
       border: 2px solid #0288d1;
       font-size: 1em;
-      position: relative;
+      font-family: inherit;
     }
     .remove-btn {
       position: absolute;
@@ -48,8 +52,10 @@
       border-radius: 50%;
       width: 20px;
       height: 20px;
-      font-size: 12px;
+      font-size: 14px;
+      font-weight: bold;
       cursor: pointer;
+      font-family: inherit;
     }
     .word-box {
       padding: 10px 15px;
@@ -59,20 +65,25 @@
       font-weight: bold;
       font-size: 1.2em;
       color: #00796b;
+      font-family: inherit;
     }
   </style>
 </head>
 <body>
   <h1>Finde den Impostor</h1>
-  <input type="text" id="playerName" placeholder="Dein Name">
-  <button onclick="addPlayer()">Hinzufügen</button>
-  <select id="categorySelect">
-    <option value="">Kategorie wählen</option>
-  </select>
-  <input type="number" id="impostorCount" min="1" value="1" style="width: 60px;">
-  <label for="impostorCount">Impostors</label>
-  <button onclick="startGame()">Start</button>
-  <button onclick="resetGame()">Reset</button>
+  <div style="display: flex; flex-direction: column; align-items: center;">
+    <input type="text" id="playerName" placeholder="Dein Name">
+    <button onclick="addPlayer()">Hinzufügen</button>
+    <select id="categorySelect">
+      <option value="">Kategorie wählen</option>
+    </select>
+    <input type="number" id="impostorCount" min="1" value="1" style="width: 60px;">
+    <label for="impostorCount">Impostors</label>
+    <div>
+      <button onclick="startGame()">Start</button>
+      <button onclick="resetGame()">Reset</button>
+    </div>
+  </div>
   <div class="player-list" id="playerList"></div>
 
   <script>
@@ -126,7 +137,6 @@
       playerList.innerHTML = "";
       players.forEach(name => {
         const container = document.createElement("div");
-        container.style.position = "relative";
         const btn = document.createElement("button");
         btn.textContent = name;
         btn.onclick = () => {
