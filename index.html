@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Finde den Betrüger</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: 'Comic Sans MS', sans-serif;
-      background: linear-gradient(to right, #ffecd2, #fcb69f);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: linear-gradient(to right, #ffdde1, #ee9ca7);
       margin: 0;
       padding: 20px;
       text-align: center;
@@ -15,48 +15,63 @@
 
     h1 {
       color: #6a1b9a;
-      font-size: 2.8em;
+      font-size: 2.5em;
       margin-bottom: 20px;
-      text-shadow: 1px 1px white;
+      text-shadow: 1px 1px #fff;
     }
 
     .box {
-      background: white;
-      border-radius: 20px;
+      background: #fff;
       padding: 25px;
-      max-width: 500px;
-      margin: 0 auto;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+      border-radius: 20px;
+      max-width: 600px;
+      margin: auto;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
     }
 
-    textarea, button, input {
-      font-size: 1em;
+    textarea {
+      width: 90%;
       padding: 10px;
-      margin: 10px 0;
+      font-size: 1em;
       border-radius: 10px;
       border: none;
-      width: 80%;
+      margin: 10px 0;
+      resize: none;
     }
 
     button {
       background-color: #8e44ad;
       color: white;
+      font-size: 1em;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 12px;
+      margin: 10px;
       cursor: pointer;
-      transition: 0.2s ease;
+      transition: 0.2s;
     }
 
     button:hover {
+      background-color: #732d91;
       transform: scale(1.05);
     }
 
-    .spieler-button {
-      display: block;
-      margin: 10px auto;
-      width: 80%;
+    .spieler-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .spieler-buttons button {
+      margin: 8px;
+      min-width: 120px;
     }
 
     @media (max-width: 600px) {
-      h1 { font-size: 2em; }
+      .spieler-buttons button {
+        min-width: 100%;
+      }
     }
   </style>
 </head>
@@ -64,9 +79,9 @@
   <h1>🎭 Finde den Betrüger!</h1>
   <div class="box">
     <p>Gib die Spielernamen ein (ein Name pro Zeile):</p>
-    <textarea id="playerNames" rows="6" placeholder="z.B. Felix&#10;Judy&#10;Ali"></textarea><br />
+    <textarea id="playerNames" rows="6" placeholder="z. B. Felix&#10;Judy&#10;Ali"></textarea><br>
     <button onclick="startGame()">Spiel starten</button>
-    <div id="result" style="margin-top: 20px;"></div>
+    <div id="result"></div>
   </div>
 
   <script>
@@ -82,38 +97,37 @@
       "Pizza", "Burger", "Sushi", "Nudeln", "Salat", "Eis", "Döner", "Currywurst", "Pommes", "Kuchen"
     ];
 
-    // Auffüllen auf 1000 Wörter mit Kombinationen
+    // auf 1000+ auffüllen
     while (woerter.length < 1000) {
-      let base = woerter[Math.floor(Math.random() * 100)];
-      let newWord = base + Math.floor(Math.random() * 1000);
-      if (!woerter.includes(newWord)) woerter.push(newWord);
+      let wort = woerter[Math.floor(Math.random() * 100)] + Math.floor(Math.random() * 9999);
+      if (!woerter.includes(wort)) woerter.push(wort);
     }
 
     function startGame() {
-      const namesInput = document.getElementById("playerNames").value.trim();
-      if (!namesInput) return alert("Bitte gib mindestens 3 Spielernamen ein.");
-      
-      const names = namesInput.split("\n").map(n => n.trim()).filter(n => n);
+      const input = document.getElementById("playerNames").value.trim();
+      if (!input) return alert("Bitte gib mindestens 3 Spielernamen ein.");
+      const names = input.split("\n").map(n => n.trim()).filter(n => n);
       if (names.length < 3) return alert("Mindestens 3 Spieler werden benötigt.");
 
-      const chosenWord = woerter[Math.floor(Math.random() * woerter.length)];
-      const impostorIndex = Math.floor(Math.random() * names.length);
-      const container = document.getElementById("result");
-      container.innerHTML = "<p>Klicke auf deinen Namen, um dein Wort zu sehen (geheim):</p>";
+      const word = woerter[Math.floor(Math.random() * woerter.length)];
+      const betruegerIndex = Math.floor(Math.random() * names.length);
+      const shuffled = [...names].sort(() => Math.random() - 0.5);
 
-      names.sort(() => Math.random() - 0.5); // mischen
-      names.forEach((name, i) => {
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = "<p>Klicke auf deinen Namen, um dein Wort zu sehen (geheim!):</p><div class='spieler-buttons'></div>";
+      const buttonContainer = resultDiv.querySelector('.spieler-buttons');
+
+      shuffled.forEach((name, i) => {
         const btn = document.createElement("button");
-        btn.className = "spieler-button";
         btn.innerText = name;
         btn.onclick = () => {
-          alert(i === impostorIndex ? "❌ Du bist der Betrüger! Versuche, das Wort zu erraten." : "✅ Dein Wort ist: " + chosenWord);
+          alert(i === betruegerIndex ? "❌ Du bist der Betrüger! Versuche, das Wort zu erraten." : "✅ Dein Wort ist: " + word);
           btn.disabled = true;
         };
-        container.appendChild(btn);
+        buttonContainer.appendChild(btn);
       });
 
-      container.innerHTML += "<p style='margin-top:15px'>🔍 Jetzt beschreibt jeder das Wort – dann wird abgestimmt!</p>";
+      resultDiv.innerHTML += "<p style='margin-top: 15px;'>🔍 Beschreibt das Wort nacheinander – dann wird abgestimmt!</p>";
     }
   </script>
 </body>
