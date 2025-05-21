@@ -7,16 +7,16 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: linear-gradient(to bottom, #b3e5fc 50%, #0288d1 50%);
+      background-color: #b3e5fc;
       text-align: center;
       padding: 20px;
     }
     h1 {
       font-size: 2.5em;
-      color: #01579b;
+      color: #0288d1;
     }
     input, button, select {
-      padding: 12px;
+      padding: 10px;
       margin: 5px;
       border-radius: 10px;
       border: 2px solid #0288d1;
@@ -28,23 +28,24 @@
       flex-wrap: wrap;
       justify-content: center;
       gap: 15px;
-      margin-top: 30px;
-      max-width: 900px;
-      margin-left: auto;
-      margin-right: auto;
+      margin-top: 20px;
     }
     .player-list > div {
       position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
     }
     .player-list button {
       background-color: white;
       cursor: pointer;
-      padding: 15px 20px;
-      border-radius: 12px;
+      padding: 12px 18px;
+      border-radius: 10px;
       border: 2px solid #0288d1;
-      font-size: 1.1em;
+      font-size: 1em;
       font-family: inherit;
-      min-width: 120px;
+      min-width: 100px;
     }
     .remove-btn {
       position: absolute;
@@ -54,23 +55,23 @@
       color: white;
       border: none;
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       font-size: 16px;
       font-weight: bold;
       cursor: pointer;
       font-family: inherit;
     }
     .word-box {
-      padding: 15px 20px;
+      margin-top: 5px;
+      padding: 8px 12px;
       background-color: #ffffff;
       border: 2px solid #00796b;
-      border-radius: 12px;
+      border-radius: 10px;
       font-weight: bold;
-      font-size: 1.2em;
+      font-size: 1em;
       color: #00796b;
       font-family: inherit;
-      min-width: 120px;
     }
   </style>
 </head>
@@ -104,8 +105,8 @@
       Berufe: ["Arzt", "Lehrer", "Polizist", "Ingenieur", "Schauspieler", "Musiker", "Pilot", "Bäcker", "Friseur", "Bauarbeiter", "Koch", "Verkäufer"],
       Marken: ["Nike", "Adidas", "Apple", "Samsung", "Coca-Cola", "BMW", "Mercedes", "Google", "Amazon", "Zara", "Lidl", "Netflix", "IKEA"],
       Promis: ["Cristiano Ronaldo", "Lionel Messi", "Elon Musk", "Pablo Picasso", "Serena Williams", "Usain Bolt", "Roger Federer", "Mark Zuckerberg", "Kanye West"],
-      Boxer: ["Mike Tyson", "Muhammad Ali", "Vitali Klitschko", "Wladimir Klitschko", "Floyd Mayweather", "Tyson Fury"],
-      Fußballer: ["Lionel Messi", "Cristiano Ronaldo", "Kylian Mbappé", "Neymar", "Luka Modrić", "Erling Haaland", "Robert Lewandowski"]
+      "Boxer / Kampfsport": ["Muhammad Ali", "Mike Tyson", "Conor McGregor", "Bruce Lee", "Floyd Mayweather", "Tyson Fury"],
+      "Fußballer / Fußball": ["Lionel Messi", "Cristiano Ronaldo", "Neymar", "Kylian Mbappé", "Lothar Matthäus", "Zinédine Zidane"]
     };
 
     categories.Alle = Object.values(categories).flat();
@@ -146,9 +147,7 @@
         const container = document.createElement("div");
         const btn = document.createElement("button");
         btn.textContent = name;
-        btn.onclick = () => {
-          if (gameStarted) toggleWord(name, btn);
-        };
+        btn.onclick = () => toggleWord(name, container);
         container.appendChild(btn);
         if (!gameStarted) {
           const remove = document.createElement("button");
@@ -197,15 +196,16 @@
       alert("Wörter wurden verteilt! Klicke auf deinen Namen, um dein Wort zu sehen.");
     }
 
-    function toggleWord(name, element) {
-      if (!assignedWords[name]) return;
-      if (element.className === "word-box") {
-        displayPlayers();
+    function toggleWord(name, container) {
+      if (!gameStarted) return;
+      const existing = container.querySelector(".word-box");
+      if (existing) {
+        container.removeChild(existing);
       } else {
         const wordBox = document.createElement("div");
         wordBox.className = "word-box";
         wordBox.textContent = assignedWords[name];
-        element.replaceWith(wordBox);
+        container.appendChild(wordBox);
       }
     }
 
