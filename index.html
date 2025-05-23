@@ -139,6 +139,7 @@
       <button id="toggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
       <div class="dropdown-content" id="categoryOptions">
         <label>Alle <input type="checkbox" id="selectAll"></label>
+        <label>Allgemein <input type="checkbox" class="cat-check" value="Allgemein"></label>
         <label>Berufe <input type="checkbox" class="cat-check" value="Berufe"></label>
         <label>Tiere <input type="checkbox" class="cat-check" value="Tiere"></label>
         <label>Länder/Städte <input type="checkbox" class="cat-check" value="Länder/Städte"></label>
@@ -164,7 +165,8 @@
   <script>
     const players = [];
     const categories = {
-"Berufe": ["Arzt", "Lehrer", "Polizist", "Feuerwehrmann", "Pilot", "Koch", "Bäcker", "Friseur", "Mechaniker", "Programmierer",
+ "Allgemein": [],
+ "Berufe": ["Arzt", "Lehrer", "Polizist", "Feuerwehrmann", "Pilot", "Koch", "Bäcker", "Friseur", "Mechaniker", "Programmierer",
             "Ingenieur", "Designer", "Elektriker", "Krankenschwester", "Pfleger", "Zahnarzt", "Anwalt", "Richter", "Bauarbeiter",
             "Verkäufer", "Musiker", "Schauspieler", "YouTuber", "Influencer", "Journalist", "Wissenschaftler", "Psychologe",
             "Architekt", "Hausmeister", "Tierarzt", "Fotograf", "Fitnesscoach", "Landwirt", "Künstler", "Busfahrer", "Taxifahrer",
