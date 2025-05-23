@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finde den Impostor</title>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -17,53 +16,6 @@
       color: #0288d1;
       margin-bottom: 20px;
     }
-    .mode-selection {
-      margin-bottom: 20px;
-    }
-    .mode-selection button,
-    .online-options button,
-    .online-options input {
-      font-size: 1.2em;
-      padding: 10px 20px;
-      margin: 10px;
-      border-radius: 10px;
-      border: 2px solid #0288d1;
-      background-color: white;
-      cursor: pointer;
-      min-width: 250px;
-    }
-    .online-options {
-      display: none;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-    .hidden {
-      display: none;
-    }
-  </style>
-</head>
-<body>
-  <h1>Finde den Impostor</h1>
-
-  <div class="mode-selection">
-    <button onclick="selectMode('offline')">🕹️ Offline spielen</button>
-    <button onclick="selectMode('online')">🌐 Online spielen</button>
-  </div>
-
-  <div class="online-options" id="onlineOptions">
-    <button onclick="showCreateRoom()">📤 Raum erstellen</button>
-    <button onclick="showJoinRoom()">📥 Raum beitreten</button>
-    <div id="joinForm" class="hidden">
-      <input type="text" id="roomCode" placeholder="🔢 Raumcode eingeben">
-      <input type="text" id="nickname" placeholder="🧑‍💼 Dein Name">
-      <button onclick="joinRoom()">🚪 Beitreten</button>
-    </div>
-  </div>
-
-  <div id="gameArea">
-
     .controls-top {
       display: flex;
       justify-content: center;
@@ -394,62 +346,6 @@
       players.sort(() => Math.random() - 0.5);
       displayPlayers();
       document.getElementById("impostorCount").value = 1;
-    }
-  </script>
-</body>
-</html>
-  </div>
-
-  <script>
-    let currentMode = 'offline';
-    let socket;
-
-    function selectMode(mode) {
-      currentMode = mode;
-      if (mode === 'online') {
-        document.getElementById('onlineOptions').style.display = 'flex';
-      } else {
-        document.getElementById('onlineOptions').style.display = 'none';
-        document.getElementById('gameArea').innerHTML = '';
-        loadOfflineGame();
-      }
-    }
-
-    function showCreateRoom() {
-      socket = io('https://your-server.com');
-      socket.emit('createRoom');
-      socket.on('roomCreated', roomCode => {
-        document.getElementById('roomCode').value = roomCode;
-        alert('Raum erstellt: ' + roomCode);
-        loadOnlineGame();
-      });
-    }
-
-    function showJoinRoom() {
-      document.getElementById('joinForm').classList.remove('hidden');
-    }
-
-    function joinRoom() {
-      const code = document.getElementById('roomCode').value.trim();
-      const name = document.getElementById('nickname').value.trim();
-      if (!code || !name) {
-        alert('Bitte Raumcode und Namen eingeben.');
-        return;
-      }
-      socket = io('https://your-server.com');
-      socket.emit('joinRoom', { code, name });
-      socket.on('joinedRoom', () => {
-        alert('Beigetreten zu Raum: ' + code);
-        loadOnlineGame();
-      });
-    }
-
-    function loadOfflineGame() {
-      document.getElementById('gameArea').innerHTML = `<p>Offline-Modus geladen. (Hier wird dein bestehender Code angezeigt.)</p>`;
-    }
-
-    function loadOnlineGame() {
-      document.getElementById('gameArea').innerHTML = `<p>Online-Modus geladen. (Hier erfolgt die Synchronisation mit Socket.IO)</p>`;
     }
   </script>
 </body>
