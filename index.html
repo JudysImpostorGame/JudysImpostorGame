@@ -151,7 +151,10 @@
         <label>Hobbys <input type="checkbox" class="cat-check" value="Hobbys"></label>
         <label>Videospiele <input type="checkbox" class="cat-check" value="Videospiele"></label>
         <label>Apps <input type="checkbox" class="cat-check" value="Apps"></label>
-      </div>
+        <label>Marken <input type="checkbox" class="cat-check" value="Marken"></label>
+        <label>Schulfächer <input type="checkbox" class="cat-check" value="Schulfächer"></label>
+        <label>Fantasiefiguren <input type="checkbox" class="cat-check" value="Fantasiefiguren"></label>
+     </div>
     </div>
   </div>
 
@@ -165,7 +168,34 @@
   <script>
     const players = [];
     const categories = {
- "Allgemein": [],
+ "Allgemein": [  "Stuhl", "Tisch", "Lampe", "Auto", "Fahrrad", "Buch", "Handy", "Schlüssel", "Fenster", "Tür",
+            "Kissen", "Uhr", "Brille", "Schuh", "Jacke", "Rucksack", "Tasse", "Löffel", "Bleistift", "Kamera",
+             "Spiegel", "Waschmaschine", "Fernseher", "Laptop", "Regenschirm", "Zahnbürste", "Seife", "Koffer", "Ball", "Kerze",
+            "Toilette", "Bett", "Decke", "Treppe", "Schrank", "Teppich", "Bild", "Geld", "Messer", "Schere",
+            "Nagel", "Hammer", "Papier", "Lineal", "Kleber", "Radiergummi", "Besen", "Spülmaschine", "Lichtschalter", "Fernbedienung",
+            "Ladegerät", "Akku", "Strom", "Herd", "Kühlschrank", "Spüle", "Mikrowelle", "Wasserkocher", "Steckdose", "Vorhang",
+            "Föhn", "Rasierer", "Lautsprecher", "Monitor", "Tastatur", "Maus", "Kabel", "Kamera", "Karton", "Mülltonne",
+            "Brief", "Umschlag", "Kugelschreiber", "Heft", "Ordner", "Schultasche", "Zettel", "Lineal", "Notizbuch", "Textmarker",
+            "Plakat", "Pflanze", "Topf", "Schaufel", "Eimer", "Gießkanne", "Karton", "Glas", "Dose", "Flasche",
+            "Schlüsselbund", "Klingel", "Straßenlaterne", "Zebrastreifen", "Ampel", "Bushaltestelle", "Rucksack", "Trinkflasche", "Haargummi", "Nagellack",
+             "Schraube", "Drucker", "Kassenzettel", "Stempel", "Einkaufswagen", "Treppe", "Balkon", "Heizung", "Lüfter", "Teekanne",
+             "Schneebesen", "Backblech", "Mixer", "Pfanne", "Kochtopf", "Strohhalm", "Trichter", "Sonnenbrille", "Kamm", "Zange", "Beamer", "USB-Stick", "Lautsprecher", "Smartwatch", "Powerbank", "Router", "Webcam", "Mikrofon", "Drohne", "Tablet",
+             "Scanner", "Headset", "Joystick", "Grafiktablet", "Laserdrucker", "Ladepad", "Blu-ray", "Netzteil", "Monitor", "Mauspad",
+             "Joghurt", "Toilettenpapier", "Spülmittel", "Bonbon", "Kekse", "Frischkäse", "Tiefkühlpizza", "Kaugummi", "Wassermelone", "Nudeln",
+             "Reis", "Ketchup", "Mayo", "Butter", "Honig", "Saft", "Putzmittel", "Zahnpasta", "Haarspray", "Kochschinken",
+              "Atlas", "Füller", "Pausenbrot", "Bleistiftanspitzer", "Radiergummi", "Weltkarte", "Hefter", "Tafel", "Kreide", "Schulbuch",
+              "Tintenpatrone", "Winkelmesser", "Textmarker", "Schulranzen", "Collegeblock", "Lehrerpult", "Lineal", "Tintenroller", "Tischtennisball", "Kopfhörer"],
+  "Marken": ["Nike", "Adidas", "Puma", "Apple", "Samsung", "Sony", "BMW", "Mercedes", "Audi", "Volkswagen",
+           "Tesla", "IKEA", "McDonald's", "Coca-Cola", "Pepsi", "Red Bull", "Google", "Amazon", "Netflix", "LEGO",
+            "PlayStation", "Xbox", "Nespresso", "Nutella", "Haribo", "Nivea", "Zara", "H&M", "Lidl", "Aldi",
+            "Spotify", "TikTok", "Instagram", "YouTube", "Facebook", "Nestlé", "Ferrero", "Bosch", "Siemens", "Philips",
+            "Rewe", "Edeka", "Subway", "Starbucks", "Balenciaga", "Gucci", "Louis Vuitton", "Rolex", "Ritter Sport", "Dr. Oetker",
+            "Google Maps", "Telegram", "Snapchat", "WhatsApp", "Twitch", "CapCut", "BeReal", "Pinterest", "Uber", "Steam",
+            "Nike Air", "Jordan", "Converse", "Vans", "Crocs", "Birkenstock", "Skechers", "Under Armour", "New Balance", "Asics",
+            "Dell", "HP", "Lenovo", "Acer", "Huawei", "Oppo", "OnePlus", "Xiaomi", "Nikon", "Canon",
+             "EA Sports", "Ubisoft", "Rockstar Games", "Epic Games", "Blizzard", "Nintendo", "SEGA", "Bandai Namco", "Activision", "Valve",
+            "Maggi", "Milka", "Oreo", "Chips Ahoy", "Pringles", "Ben & Jerry’s", "Langnese", "Iglo", "Müller", "Philadelphia",
+            "Kaufland", "Decathlon", "MediaMarkt", "Saturn", "dm", "Rossmann", "Tchibo", "Depot", "Douglas", "Hornbach"]
  "Berufe": ["Arzt", "Lehrer", "Polizist", "Feuerwehrmann", "Pilot", "Koch", "Bäcker", "Friseur", "Mechaniker", "Programmierer",
             "Ingenieur", "Designer", "Elektriker", "Krankenschwester", "Pfleger", "Zahnarzt", "Anwalt", "Richter", "Bauarbeiter",
             "Verkäufer", "Musiker", "Schauspieler", "YouTuber", "Influencer", "Journalist", "Wissenschaftler", "Psychologe",
@@ -219,6 +249,13 @@
 "Apps": ["Instagram", "TikTok", "WhatsApp", "YouTube", "Spotify", "Snapchat", "Google Maps", "Amazon", "Netflix",
           "Twitter", "Facebook", "Telegram", "Discord", "Zoom", "Teams", "Google Drive", "eBay", "Klarna", "Pinterest", "Reddit", "BeReal", "CapCut", "Duolingo", "ChatGPT", "Shazam", "GoodNotes", "Notion", "Blitz", "Twitch", "Depop",
           "Too Good To Go", "Yuka", "Airbnb", "Tinder", "Jodel", "OneFootball", "Telegram", "Google Photos", "Steam", "Uber"]
+    "Schulfächer": ["Mathematik", "Deutsch", "Englisch", "Biologie", "Physik", "Chemie", "Geschichte", "Erdkunde", "Informatik", "Sport",
+                "Musik", "Kunst", "Religion", "Ethik", "Wirtschaft", "Politik", "Philosophie", "Spanisch", "Französisch", "Latein",
+                 "Technik", "Sozialwissenschaften", "Darstellen und Gestalten", "Hauswirtschaft", "Gesundheit"]
+    "Fantasiefiguren": ["Drache", "Vampir", "Einhorn", "Zauberer", "Hexe", "Meerjungfrau", "Geist", "Kobold", "Troll", "Elf",
+                       "Feuerdämon", "Werwolf", "Zombie", "Phönix", "Riese", "Schneemonster", "Dämon", "Ork", "Golem", "Greif",
+                       "Zyklop", "Centaur", "Pegasus", "Dschinn", "Skelettkrieger"]
+
     };
 
     let assignedWords = {};
