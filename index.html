@@ -1,39 +1,21 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Finde den Impostor</title>
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-
     body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
       font-family: Arial, sans-serif;
       background-color: #b3e5fc;
       text-align: center;
-      box-sizing: border-box;
       padding: 20px;
     }
-
-    .main-container {
-      width: 100%;
-      max-width: 600px;
-    }
-
     h1 {
       font-size: 2.5em;
       color: #0288d1;
       margin-bottom: 20px;
     }
-
     .controls-top {
       display: flex;
       justify-content: center;
@@ -42,28 +24,21 @@
       align-items: center;
       margin-bottom: 10px;
     }
-
-    .controls-top input,
-    .controls-top button,
-    .controls-top label {
+    .controls-top input, .controls-top button, .controls-top label {
       font-size: 1.1em;
       min-width: 120px;
     }
-
     #impostorCount {
       width: 60px;
       text-align: center;
     }
-
     .controls-bottom {
       margin-bottom: 20px;
     }
-
     .category-dropdown {
       position: relative;
       display: inline-block;
     }
-
     .dropdown-content {
       display: none;
       position: absolute;
@@ -77,11 +52,9 @@
       overflow-y: auto;
       text-align: left;
     }
-
     .category-dropdown.open .dropdown-content {
       display: block;
     }
-
     .dropdown-content label {
       display: flex;
       justify-content: space-between;
@@ -89,17 +62,13 @@
       margin: 5px 0;
       font-size: 0.95em;
     }
-
-    input,
-    button,
-    select {
+    input, button, select {
       padding: 10px;
       border-radius: 10px;
       border: 2px solid #0288d1;
       font-size: 1em;
       font-family: inherit;
     }
-
     .player-list {
       display: flex;
       flex-wrap: wrap;
@@ -107,11 +76,9 @@
       gap: 15px;
       margin-top: 20px;
     }
-
     .player-list > div {
       position: relative;
     }
-
     .player-list button {
       background-color: white;
       cursor: pointer;
@@ -121,7 +88,6 @@
       font-size: 1.1em;
       font-family: inherit;
     }
-
     .remove-btn {
       position: absolute;
       top: -12px;
@@ -140,7 +106,6 @@
       align-items: center;
       justify-content: center;
     }
-
     .word-box {
       padding: 12px 20px;
       background-color: #ffffff;
@@ -152,86 +117,54 @@
       font-family: inherit;
       cursor: pointer;
     }
-
-    /* Responsive für kleinere Geräte */
-    @media (max-width: 768px) {
-      h1 {
-        font-size: 2em;
-      }
-
+    @media (max-width: 600px) {
       .controls-top {
         flex-direction: column;
-        align-items: stretch;
         gap: 8px;
-      }
-
-      .controls-top input,
-      .controls-top button,
-      .controls-top label,
-      .dropdown-content label {
-        font-size: 1em;
-        min-width: unset;
-        width: 100%;
-      }
-
-      .player-list button {
-        font-size: 1em;
-        padding: 10px;
-      }
-
-      .word-box {
-        font-size: 1em;
-        padding: 10px;
-      }
-
-      .dropdown-content {
-        min-width: 100%;
-        left: 0;
-        right: 0;
       }
     }
   </style>
 </head>
 <body>
-  <div class="main-container">
-    <h1>Finde den Impostor</h1>
+  <h1>Finde den Impostor</h1>
 
-    <div class="controls-top">
-      <input type="text" id="playerName" placeholder="Dein Name" />
-      <button onclick="addPlayer()">Hinzufügen</button>
-      <div style="display: flex; align-items: center; gap: 5px;">
-        <input type="number" id="impostorCount" min="1" value="1" />
-        <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
-      </div>
-      <div class="category-dropdown">
-        <button id="toggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
-        <div class="dropdown-content" id="categoryOptions">
-          <label>Alle <input type="checkbox" id="selectAll" /></label>
-          <label>Allgemein <input type="checkbox" class="cat-check" value="Allgemein" /></label>
-          <label>Berufe <input type="checkbox" class="cat-check" value="Berufe" /></label>
-          <label>Tiere <input type="checkbox" class="cat-check" value="Tiere" /></label>
-          <label>Länder/Städte <input type="checkbox" class="cat-check" value="Länder/Städte" /></label>
-          <label>Essen & Trinken <input type="checkbox" class="cat-check" value="Essen & Trinken" /></label>
-          <label>Filme oder Serien <input type="checkbox" class="cat-check" value="Filme oder Serien" /></label>
-          <label>Sportarten <input type="checkbox" class="cat-check" value="Sportarten" /></label>
-          <label>Kampfsportler <input type="checkbox" class="cat-check" value="Kampfsportler" /></label>
-          <label>Fußballer <input type="checkbox" class="cat-check" value="Fußballer" /></label>
-          <label>Hobbys <input type="checkbox" class="cat-check" value="Hobbys" /></label>
-          <label>Videospiele <input type="checkbox" class="cat-check" value="Videospiele" /></label>
-          <label>Apps <input type="checkbox" class="cat-check" value="Apps" /></label>
-          <label>Marken <input type="checkbox" class="cat-check" value="Marken" /></label>
-          <label>Schulfächer <input type="checkbox" class="cat-check" value="Schulfächer" /></label>
-          <label>Fantasiefiguren <input type="checkbox" class="cat-check" value="Fantasiefiguren" /></label>
-        </div>
-      </div>
+  <div class="controls-top">
+    <input type="text" id="playerName" placeholder="Dein Name">
+    <button onclick="addPlayer()">Hinzufügen</button>
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <input type="number" id="impostorCount" min="1" value="1">
+      <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
     </div>
-
-    <div class="controls-bottom">
-      <button onclick="startGame()">Start</button>
-      <button onclick="resetGame()">Reset</button>
+    <div class="category-dropdown">
+      <button id="toggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
+      <div class="dropdown-content" id="categoryOptions">
+        <label>Alle <input type="checkbox" id="selectAll"></label>
+        <label>Allgemein <input type="checkbox" class="cat-check" value="Allgemein"></label>
+        <label>Berufe <input type="checkbox" class="cat-check" value="Berufe"></label>
+        <label>Tiere <input type="checkbox" class="cat-check" value="Tiere"></label>
+        <label>Länder/Städte <input type="checkbox" class="cat-check" value="Länder/Städte"></label>
+        <label>Essen & Trinken <input type="checkbox" class="cat-check" value="Essen & Trinken"></label>
+        <label>Filme oder Serien <input type="checkbox" class="cat-check" value="Filme oder Serien"></label>
+        <label>Sportarten <input type="checkbox" class="cat-check" value="Sportarten"></label>
+        <label>Kampfsportler <input type="checkbox" class="cat-check" value="Kampfsportler"></label>
+        <label>Fußballer <input type="checkbox" class="cat-check" value="Fußballer"></label>
+        <label>Hobbys <input type="checkbox" class="cat-check" value="Hobbys"></label>
+        <label>Videospiele <input type="checkbox" class="cat-check" value="Videospiele"></label>
+        <label>Apps <input type="checkbox" class="cat-check" value="Apps"></label>
+        <label>Marken <input type="checkbox" class="cat-check" value="Marken"></label>
+        <label>Schulfächer <input type="checkbox" class="cat-check" value="Schulfächer"></label>
+        <label>Fantasiefiguren <input type="checkbox" class="cat-check" value="Fantasiefiguren"></label>
+     </div>
     </div>
+  </div>
 
-    <div class="player-list" id="playerList"></div>
+  <div class="controls-bottom">
+    <button onclick="startGame()">Start</button>
+    <button onclick="resetGame()">Reset</button>
+  </div>
+
+  <div class="player-list" id="playerList"></div>
+
   <script>
     const players = [];
     const categories = {
