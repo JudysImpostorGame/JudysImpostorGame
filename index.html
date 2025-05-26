@@ -5,13 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Finde den Impostor</title>
   <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
       font-family: Arial, sans-serif;
       background-color: #b3e5fc;
       text-align: center;
-      padding: 20px;
       box-sizing: border-box;
-      max-width: 100%;
+      padding: 20px;
+    }
+
+    .main-container {
+      width: 100%;
+      max-width: 600px;
     }
 
     h1 {
@@ -139,7 +153,7 @@
       cursor: pointer;
     }
 
-    /* Mobile Optimierung */
+    /* Responsive für kleinere Geräte */
     @media (max-width: 768px) {
       h1 {
         font-size: 2em;
@@ -179,44 +193,45 @@
   </style>
 </head>
 <body>
-  <h1>Finde den Impostor</h1>
+  <div class="main-container">
+    <h1>Finde den Impostor</h1>
 
-  <div class="controls-top">
-    <input type="text" id="playerName" placeholder="Dein Name" />
-    <button onclick="addPlayer()">Hinzufügen</button>
-    <div style="display: flex; align-items: center; gap: 5px;">
-      <input type="number" id="impostorCount" min="1" value="1" />
-      <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
-    </div>
-    <div class="category-dropdown">
-      <button id="toggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
-      <div class="dropdown-content" id="categoryOptions">
-        <label>Alle <input type="checkbox" id="selectAll" /></label>
-        <label>Allgemein <input type="checkbox" class="cat-check" value="Allgemein" /></label>
-        <label>Berufe <input type="checkbox" class="cat-check" value="Berufe" /></label>
-        <label>Tiere <input type="checkbox" class="cat-check" value="Tiere" /></label>
-        <label>Länder/Städte <input type="checkbox" class="cat-check" value="Länder/Städte" /></label>
-        <label>Essen & Trinken <input type="checkbox" class="cat-check" value="Essen & Trinken" /></label>
-        <label>Filme oder Serien <input type="checkbox" class="cat-check" value="Filme oder Serien" /></label>
-        <label>Sportarten <input type="checkbox" class="cat-check" value="Sportarten" /></label>
-        <label>Kampfsportler <input type="checkbox" class="cat-check" value="Kampfsportler" /></label>
-        <label>Fußballer <input type="checkbox" class="cat-check" value="Fußballer" /></label>
-        <label>Hobbys <input type="checkbox" class="cat-check" value="Hobbys" /></label>
-        <label>Videospiele <input type="checkbox" class="cat-check" value="Videospiele" /></label>
-        <label>Apps <input type="checkbox" class="cat-check" value="Apps" /></label>
-        <label>Marken <input type="checkbox" class="cat-check" value="Marken" /></label>
-        <label>Schulfächer <input type="checkbox" class="cat-check" value="Schulfächer" /></label>
-        <label>Fantasiefiguren <input type="checkbox" class="cat-check" value="Fantasiefiguren" /></label>
+    <div class="controls-top">
+      <input type="text" id="playerName" placeholder="Dein Name" />
+      <button onclick="addPlayer()">Hinzufügen</button>
+      <div style="display: flex; align-items: center; gap: 5px;">
+        <input type="number" id="impostorCount" min="1" value="1" />
+        <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
+      </div>
+      <div class="category-dropdown">
+        <button id="toggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
+        <div class="dropdown-content" id="categoryOptions">
+          <label>Alle <input type="checkbox" id="selectAll" /></label>
+          <label>Allgemein <input type="checkbox" class="cat-check" value="Allgemein" /></label>
+          <label>Berufe <input type="checkbox" class="cat-check" value="Berufe" /></label>
+          <label>Tiere <input type="checkbox" class="cat-check" value="Tiere" /></label>
+          <label>Länder/Städte <input type="checkbox" class="cat-check" value="Länder/Städte" /></label>
+          <label>Essen & Trinken <input type="checkbox" class="cat-check" value="Essen & Trinken" /></label>
+          <label>Filme oder Serien <input type="checkbox" class="cat-check" value="Filme oder Serien" /></label>
+          <label>Sportarten <input type="checkbox" class="cat-check" value="Sportarten" /></label>
+          <label>Kampfsportler <input type="checkbox" class="cat-check" value="Kampfsportler" /></label>
+          <label>Fußballer <input type="checkbox" class="cat-check" value="Fußballer" /></label>
+          <label>Hobbys <input type="checkbox" class="cat-check" value="Hobbys" /></label>
+          <label>Videospiele <input type="checkbox" class="cat-check" value="Videospiele" /></label>
+          <label>Apps <input type="checkbox" class="cat-check" value="Apps" /></label>
+          <label>Marken <input type="checkbox" class="cat-check" value="Marken" /></label>
+          <label>Schulfächer <input type="checkbox" class="cat-check" value="Schulfächer" /></label>
+          <label>Fantasiefiguren <input type="checkbox" class="cat-check" value="Fantasiefiguren" /></label>
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="controls-bottom">
-    <button onclick="startGame()">Start</button>
-    <button onclick="resetGame()">Reset</button>
-  </div>
+    <div class="controls-bottom">
+      <button onclick="startGame()">Start</button>
+      <button onclick="resetGame()">Reset</button>
+    </div>
 
-  <div class="player-list" id="playerList"></div>
+    <div class="player-list" id="playerList"></div>
   <script>
     const players = [];
     const categories = {
