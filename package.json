@@ -1,0 +1,16 @@
+diff --git a//dev/null b/package.json
+index 0000000000000000000000000000000000000000..b39a310b3a9ab0c34fd7346357890c39ec045b30 100644
+--- a//dev/null
++++ b/package.json
+@@ -0,0 +1,11 @@
++{
++  "name": "judys-impostor-game-server",
++  "version": "1.0.0",
++  "description": "Server for online mode of Finde den Impostor",
++  "main": "server.js",
++  "type": "module",
++  "dependencies": {
++    "express": "^4.18.2",
++    "socket.io": "^4.6.1"
++  }
++}
