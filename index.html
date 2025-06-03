@@ -1,307 +1,391 @@
-diff --git a/index.html b/index.html
-index 694667dc879d1c2352171c7ec476a445d64e264c..8c66a11496b0b7a4c4305a2502e586b305883638 100644
---- a/index.html
-+++ b/index.html
-@@ -102,93 +102,146 @@
-       font-weight: bold;
-       cursor: pointer;
-       font-family: inherit;
-       display: flex;
-       align-items: center;
-       justify-content: center;
-     }
-     .word-box {
-       padding: 12px 20px;
-       background-color: #ffffff;
-       border: 2px solid #00796b;
-       border-radius: 10px;
-       font-weight: bold;
-       font-size: 1.2em;
-       color: #00796b;
-       font-family: inherit;
-       cursor: pointer;
-     }
-     @media (max-width: 600px) {
-       .controls-top {
-         flex-direction: column;
-         gap: 8px;
-       }
-     }
-   </style>
-+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
- </head>
- <body>
-   <h1>Finde den Impostor</h1>
-+ 
-+<div id="modeSelection">
-+  <button onclick="showOffline()">Offline spielen</button>
-+  <button onclick="showOnline()">Online spielen</button>
-+</div>
-+<div id="offlineSection" style="display:none;">
-+
- 
-   <div class="controls-top">
-     <input type="text" id="playerName" placeholder="Dein Name">
-     <button onclick="addPlayer()">Hinzufügen</button>
-     <div style="display: flex; align-items: center; gap: 5px;">
-       <input type="number" id="impostorCount" min="1" value="1">
-       <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finde den Impostor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #b3e5fc;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #0288d1;
+      margin-bottom: 20px;
+    }
+    .controls-top {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .controls-top input, .controls-top button, .controls-top label {
+      font-size: 1.1em;
+      min-width: 120px;
+    }
+    #impostorCount {
+      width: 60px;
+      text-align: center;
+    }
+    .controls-bottom {
+      margin-bottom: 20px;
+    }
+    .category-dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #fff;
+      min-width: 220px;
+      border: 2px solid #0288d1;
+      border-radius: 10px;
+      padding: 10px;
+      z-index: 1;
+      max-height: 300px;
+      overflow-y: auto;
+      text-align: left;
+    }
+    .category-dropdown.open .dropdown-content {
+      display: block;
+    }
+    .dropdown-content label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 5px 0;
+      font-size: 0.95em;
+    }
+    input, button, select {
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #0288d1;
+      font-size: 1em;
+      font-family: inherit;
+    }
+    .player-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+    .player-list > div {
+      position: relative;
+    }
+    .player-list button {
+      background-color: white;
+      cursor: pointer;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: 2px solid #0288d1;
+      font-size: 1.1em;
+      font-family: inherit;
+    }
+    .remove-btn {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      background: #ff0000;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .word-box {
+      padding: 12px 20px;
+      background-color: #ffffff;
+      border: 2px solid #00796b;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1.2em;
+      color: #00796b;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    @media (max-width: 600px) {
+      .controls-top {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Finde den Impostor</h1>
+
+  <div class="controls-top">
+    <input type="text" id="playerName" placeholder="Dein Name">
+    <button onclick="addPlayer()">Hinzufügen</button>
+    <div style="display: flex; align-items: center; gap: 5px;">
+      <input type="number" id="impostorCount" min="1" value="1">
+      <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
+    </div>
+    <div class="category-dropdown">
+      <button id="toggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
+      <div class="dropdown-content" id="categoryOptions">
+        <label>Alle <input type="checkbox" id="selectAll"></label>
+        <label>Allgemein <input type="checkbox" class="cat-check" value="Allgemein"></label>
+        <label>Berufe <input type="checkbox" class="cat-check" value="Berufe"></label>
+        <label>Tiere <input type="checkbox" class="cat-check" value="Tiere"></label>
+        <label>Länder/Städte <input type="checkbox" class="cat-check" value="Länder/Städte"></label>
+        <label>Essen & Trinken <input type="checkbox" class="cat-check" value="Essen & Trinken"></label>
+        <label>Filme oder Serien <input type="checkbox" class="cat-check" value="Filme oder Serien"></label>
+        <label>Sportarten <input type="checkbox" class="cat-check" value="Sportarten"></label>
+        <label>Kampfsportler <input type="checkbox" class="cat-check" value="Kampfsportler"></label>
+        <label>Fußballer <input type="checkbox" class="cat-check" value="Fußballer"></label>
+        <label>Hobbys <input type="checkbox" class="cat-check" value="Hobbys"></label>
+        <label>Videospiele <input type="checkbox" class="cat-check" value="Videospiele"></label>
+        <label>Apps <input type="checkbox" class="cat-check" value="Apps"></label>
+        <label>Marken <input type="checkbox" class="cat-check" value="Marken"></label>
+        <label>Schulfächer <input type="checkbox" class="cat-check" value="Schulfächer"></label>
+        <label>Fantasiefiguren <input type="checkbox" class="cat-check" value="Fantasiefiguren"></label>
      </div>
-     <div class="category-dropdown">
-       <button id="toggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
-       <div class="dropdown-content" id="categoryOptions">
-         <label>Alle <input type="checkbox" id="selectAll"></label>
-         <label>Allgemein <input type="checkbox" class="cat-check" value="Allgemein"></label>
-         <label>Berufe <input type="checkbox" class="cat-check" value="Berufe"></label>
-         <label>Tiere <input type="checkbox" class="cat-check" value="Tiere"></label>
-         <label>Länder/Städte <input type="checkbox" class="cat-check" value="Länder/Städte"></label>
-         <label>Essen & Trinken <input type="checkbox" class="cat-check" value="Essen & Trinken"></label>
-         <label>Filme oder Serien <input type="checkbox" class="cat-check" value="Filme oder Serien"></label>
-         <label>Sportarten <input type="checkbox" class="cat-check" value="Sportarten"></label>
-         <label>Kampfsportler <input type="checkbox" class="cat-check" value="Kampfsportler"></label>
-         <label>Fußballer <input type="checkbox" class="cat-check" value="Fußballer"></label>
-         <label>Hobbys <input type="checkbox" class="cat-check" value="Hobbys"></label>
-         <label>Videospiele <input type="checkbox" class="cat-check" value="Videospiele"></label>
-         <label>Apps <input type="checkbox" class="cat-check" value="Apps"></label>
-         <label>Marken <input type="checkbox" class="cat-check" value="Marken"></label>
-         <label>Schulfächer <input type="checkbox" class="cat-check" value="Schulfächer"></label>
-         <label>Fantasiefiguren <input type="checkbox" class="cat-check" value="Fantasiefiguren"></label>
-      </div>
-     </div>
-   </div>
- 
-   <div class="controls-bottom">
-     <button onclick="startGame()">Start</button>
-     <button onclick="resetGame()">Reset</button>
-   </div>
- 
-   <div class="player-list" id="playerList"></div>
- 
-+</div>
-+<div id="onlineMenu" style="display:none;">
-+  <button onclick="createRoom()">Raum erstellen</button>
-+  <button onclick="joinRoom()">Raum beitreten</button>
-+</div>
-+
-+<div id="onlineLobby" style="display:none;">
-+  <div>Raumcode: <span id="roomCodeDisplay"></span></div>
-+  <div class="controls-top">
-+    <input type="number" id="onlineImpostorCount" min="1" value="1" style="display:none;">
-+    <span id="onlineImpostorLabel" style="display:none;background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
-+    <div class="category-dropdown" id="onlineCategoryDropdown" style="display:none;">
-+      <button id="onlineToggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
-+      <div class="dropdown-content" id="onlineCategoryOptions">
-+        <label>Alle <input type="checkbox" id="onlineSelectAll"></label>
-+        <label>Allgemein <input type="checkbox" class="cat-check-online" value="Allgemein"></label>
-+        <label>Berufe <input type="checkbox" class="cat-check-online" value="Berufe"></label>
-+        <label>Tiere <input type="checkbox" class="cat-check-online" value="Tiere"></label>
-+        <label>Länder/Städte <input type="checkbox" class="cat-check-online" value="Länder/Städte"></label>
-+        <label>Essen & Trinken <input type="checkbox" class="cat-check-online" value="Essen & Trinken"></label>
-+        <label>Filme oder Serien <input type="checkbox" class="cat-check-online" value="Filme oder Serien"></label>
-+        <label>Sportarten <input type="checkbox" class="cat-check-online" value="Sportarten"></label>
-+        <label>Kampfsportler <input type="checkbox" class="cat-check-online" value="Kampfsportler"></label>
-+        <label>Fußballer <input type="checkbox" class="cat-check-online" value="Fußballer"></label>
-+        <label>Hobbys <input type="checkbox" class="cat-check-online" value="Hobbys"></label>
-+        <label>Videospiele <input type="checkbox" class="cat-check-online" value="Videospiele"></label>
-+        <label>Apps <input type="checkbox" class="cat-check-online" value="Apps"></label>
-+        <label>Marken <input type="checkbox" class="cat-check-online" value="Marken"></label>
-+        <label>Schulfächer <input type="checkbox" class="cat-check-online" value="Schulfächer"></label>
-+        <label>Fantasiefiguren <input type="checkbox" class="cat-check-online" value="Fantasiefiguren"></label>
-+      </div>
-+    </div>
-+  </div>
-+  <div class="controls-bottom">
-+    <button onclick="startOnlineGame()" id="onlineStartBtn" style="display:none;">Start</button>
-+    <button onclick="resetOnlineGame()">Reset</button>
-+  </div>
-+  <div class="player-list" id="onlinePlayerList"></div>
-+</div>
-+
-   <script>
-     const players = [];
-+let online=false;
-+let socket=null;
-+let roomCode="";
-+let myName="";
-+let isHost=false;
-     const categories = {
-  "Allgemein": [  "Stuhl", "Tisch", "Lampe", "Auto", "Fahrrad", "Buch", "Handy", "Schlüssel", "Fenster", "Tür",
-             "Kissen", "Uhr", "Brille", "Schuh", "Jacke", "Rucksack", "Tasse", "Löffel", "Bleistift", "Kamera",
-              "Spiegel", "Waschmaschine", "Fernseher", "Laptop", "Regenschirm", "Zahnbürste", "Seife", "Koffer", "Ball", "Kerze",
-             "Toilette", "Bett", "Decke", "Treppe", "Schrank", "Teppich", "Bild", "Geld", "Messer", "Schere",
-             "Nagel", "Hammer", "Papier", "Lineal", "Kleber", "Radiergummi", "Besen", "Spülmaschine", "Lichtschalter", "Fernbedienung",
-             "Ladegerät", "Akku", "Strom", "Herd", "Kühlschrank", "Spüle", "Mikrowelle", "Wasserkocher", "Steckdose", "Vorhang",
-             "Föhn", "Rasierer", "Lautsprecher", "Monitor", "Tastatur", "Maus", "Kabel", "Kamera", "Karton", "Mülltonne",
-             "Brief", "Umschlag", "Kugelschreiber", "Heft", "Ordner", "Schultasche", "Zettel", "Lineal", "Notizbuch", "Textmarker",
-             "Plakat", "Pflanze", "Topf", "Schaufel", "Eimer", "Gießkanne", "Karton", "Glas", "Dose", "Flasche",
-             "Schlüsselbund", "Klingel", "Straßenlaterne", "Zebrastreifen", "Ampel", "Bushaltestelle", "Rucksack", "Trinkflasche", "Haargummi", "Nagellack",
-              "Schraube", "Drucker", "Kassenzettel", "Stempel", "Einkaufswagen", "Treppe", "Balkon", "Heizung", "Lüfter", "Teekanne",
-              "Schneebesen", "Backblech", "Mixer", "Pfanne", "Kochtopf", "Strohhalm", "Trichter", "Sonnenbrille", "Kamm", "Zange", "Beamer", "USB-Stick", "Lautsprecher", "Smartwatch", "Powerbank", "Router", "Webcam", "Mikrofon", "Drohne", "Tablet",
-              "Scanner", "Headset", "Joystick", "Grafiktablet", "Laserdrucker", "Ladepad", "Blu-ray", "Netzteil", "Monitor", "Mauspad",
-              "Joghurt", "Toilettenpapier", "Spülmittel", "Bonbon", "Kekse", "Frischkäse", "Tiefkühlpizza", "Kaugummi", "Wassermelone", "Nudeln",
-              "Reis", "Ketchup", "Mayo", "Butter", "Honig", "Saft", "Putzmittel", "Zahnpasta", "Haarspray", "Kochschinken",
-               "Atlas", "Füller", "Pausenbrot", "Bleistiftanspitzer", "Radiergummi", "Weltkarte", "Hefter", "Tafel", "Kreide", "Schulbuch",
-               "Tintenpatrone", "Winkelmesser", "Textmarker", "Schulranzen", "Collegeblock", "Lehrerpult", "Lineal", "Tintenroller", "Tischtennisball", "Kopfhörer"],
-   "Marken": ["Nike", "Adidas", "Puma", "Apple", "Samsung", "Sony", "BMW", "Mercedes", "Audi", "Volkswagen",
-            "Tesla", "IKEA", "McDonald's", "Coca-Cola", "Pepsi", "Red Bull", "Google", "Amazon", "Netflix", "LEGO",
-             "PlayStation", "Xbox", "Nespresso", "Nutella", "Haribo", "Nivea", "Zara", "H&M", "Lidl", "Aldi",
-             "Spotify", "TikTok", "Instagram", "YouTube", "Facebook", "Nestlé", "Ferrero", "Bosch", "Siemens", "Philips",
-             "Rewe", "Edeka", "Subway", "Starbucks", "Balenciaga", "Gucci", "Louis Vuitton", "Rolex", "Ritter Sport", "Dr. Oetker",
-             "Google Maps", "Telegram", "Snapchat", "WhatsApp", "Twitch", "CapCut", "BeReal", "Pinterest", "Uber", "Steam",
-             "Nike Air", "Jordan", "Converse", "Vans", "Crocs", "Birkenstock", "Skechers", "Under Armour", "New Balance", "Asics",
-diff --git a/index.html b/index.html
-index 694667dc879d1c2352171c7ec476a445d64e264c..8c66a11496b0b7a4c4305a2502e586b305883638 100644
---- a/index.html
-+++ b/index.html
-@@ -362,28 +415,151 @@
- 
-       displayPlayers();
-       alert("Wörter wurden verteilt! Klicke auf deinen Namen, um dein Wort zu sehen.");
-     }
- 
-     function toggleWord(name, button) {
-       if (button.classList.contains("word-box")) {
-         displayPlayers();
-       } else if (assignedWords[name]) {
-         const wordBox = document.createElement("div");
-         wordBox.className = "word-box";
-         wordBox.textContent = assignedWords[name];
-         wordBox.onclick = () => toggleWord(name, wordBox);
-         button.replaceWith(wordBox);
-       }
-     }
- 
-     function resetGame() {
-       assignedWords = {};
-       impostors = [];
-       gameStarted = false;
-       players.sort(() => Math.random() - 0.5);
-       displayPlayers();
-       document.getElementById("impostorCount").value = 1;
-     }
-+function showOffline(){
-+  document.getElementById('modeSelection').style.display='none';
-+  document.getElementById('offlineSection').style.display='block';
-+}
-+
-+function showOnline(){
-+  document.getElementById('modeSelection').style.display='none';
-+  document.getElementById('onlineMenu').style.display='block';
-+}
-+
-+function createRoom(){
-+  myName = prompt('Dein Name?');
-+  if(!myName) return;
-+  socket = io();
-+  socket.emit('createRoom',{name:myName},({code})=>{
-+    roomCode=code;
-+    isHost=true;
-+    online=true;
-+    document.getElementById('roomCodeDisplay').textContent=code;
-+    document.getElementById('onlineMenu').style.display='none';
-+    document.getElementById('onlineLobby').style.display='block';
-+    document.getElementById('onlineImpostorCount').style.display='inline-block';
-+    document.getElementById('onlineImpostorLabel').style.display='inline-block';
-+    document.getElementById('onlineCategoryDropdown').style.display='inline-block';
-+    document.getElementById('onlineStartBtn').style.display='inline-block';
-+  });
-+  setupSocket();
-+}
-+
-+function joinRoom(){
-+  roomCode = prompt('Raumcode?');
-+  myName = prompt('Dein Name?');
-+  if(!roomCode || !myName) return;
-+  socket = io();
-+  socket.emit('joinRoom',{code:roomCode,name:myName},(res)=>{
-+    if(res && res.error){ alert(res.error); return; }
-+    online=true;
-+    isHost=false;
-+    document.getElementById('roomCodeDisplay').textContent=roomCode;
-+    document.getElementById('onlineMenu').style.display='none';
-+    document.getElementById('onlineLobby').style.display='block';
-+  });
-+  setupSocket();
-+}
-+
-+function setupSocket(){
-+  socket.on('playerList',names=>{
-+    players.length=0;
-+    players.push(...names);
-+    displayPlayersOnline();
-+  });
-+  socket.on('wordAssignment',({word})=>{
-+    assignedWords[myName]=word;
-+    showWordOverlay(word);
-+  });
-+  socket.on('gameStarted',()=>{
-+    gameStarted=true;
-+    displayPlayersOnline();
-+  });
-+}
-+
-+function displayPlayersOnline(){
-+  const list=document.getElementById('onlinePlayerList');
-+  if(!list) return;
-+  list.innerHTML='';
-+  players.forEach(n=>{
-+    const c=document.createElement('div');
-+    const b=document.createElement('button');
-+    b.textContent=n;
-+    if(n===myName){
-+      b.onclick=()=>{ if(assignedWords[n]) showWordOverlay(assignedWords[n]); };
-+    }
-+    c.appendChild(b);
-+    list.appendChild(c);
-+  });
-+}
-+
-+function showWordOverlay(word){
-+  const o=document.createElement('div');
-+  o.style.position='fixed';
-+  o.style.top='0';
-+  o.style.left='0';
-+  o.style.right='0';
-+  o.style.bottom='0';
-+  o.style.background='#fff';
-+  o.style.display='flex';
-+  o.style.alignItems='center';
-+  o.style.justifyContent='center';
-+  o.style.fontSize='2em';
-+  o.textContent=word;
-+  o.onclick=()=>o.remove();
-+  document.body.appendChild(o);
-+}
-+
-+function getSelectedCategoriesOnline(){
-+  const checks=document.querySelectorAll('#onlineCategoryOptions .cat-check-online:checked');
-+  return Array.from(checks).map(cb=>cb.value);
-+}
-+
-+function startOnlineGame(){
-+  const impostorCount=parseInt(document.getElementById('onlineImpostorCount').value);
-+  const cats=getSelectedCategoriesOnline();
-+  let wordPool=[];
-+  cats.forEach(c=>wordPool=wordPool.concat(categories[c]||[]));
-+  if(players.length<3){alert('Mindestens 3 Spieler erforderlich.');return;}
-+  if(wordPool.length===0){alert('Bitte mindestens eine Kategorie auswählen.');return;}
-+  if(impostorCount>=players.length){alert('Impostor-Anzahl muss kleiner als Spieleranzahl sein.');return;}
-+  const selectedWord=wordPool[Math.floor(Math.random()*wordPool.length)];
-+  const shuffled=[...players].sort(()=>Math.random()-0.5);
-+  const imps=shuffled.slice(0,impostorCount);
-+  assignedWords={};
-+  players.forEach(n=>{assignedWords[n]=imps.includes(n)?'IMPOSTOR':selectedWord;});
-+  socket.emit('startGame',{code:roomCode,assignments:assignedWords});
-+}
-+
-+function resetOnlineGame(){
-+  if(socket) socket.disconnect();
-+  location.reload();
-+}
-+
-+document.getElementById('onlineToggleCategoryButton').addEventListener('click',function(e){e.stopPropagation();this.parentElement.classList.toggle('open');});
-+document.addEventListener('click',function(e){const d=document.getElementById('onlineCategoryDropdown');if(d&&!d.contains(e.target))d.classList.remove('open');});
-+document.getElementById('onlineSelectAll').addEventListener('change',function(){document.querySelectorAll('.cat-check-online').forEach(cb=>cb.checked=this.checked);});
-   </script>
+    </div>
+  </div>
+
+  <div class="controls-bottom">
+    <button onclick="startGame()">Start</button>
+    <button onclick="resetGame()">Reset</button>
+  </div>
+
+  <div class="player-list" id="playerList"></div>
+
+  <script>
+    const players = [];
+    const categories = {
+ "Allgemein": [  "Stuhl", "Tisch", "Lampe", "Auto", "Fahrrad", "Buch", "Handy", "Schlüssel", "Fenster", "Tür",
+            "Kissen", "Uhr", "Brille", "Schuh", "Jacke", "Rucksack", "Tasse", "Löffel", "Bleistift", "Kamera",
+             "Spiegel", "Waschmaschine", "Fernseher", "Laptop", "Regenschirm", "Zahnbürste", "Seife", "Koffer", "Ball", "Kerze",
+            "Toilette", "Bett", "Decke", "Treppe", "Schrank", "Teppich", "Bild", "Geld", "Messer", "Schere",
+            "Nagel", "Hammer", "Papier", "Lineal", "Kleber", "Radiergummi", "Besen", "Spülmaschine", "Lichtschalter", "Fernbedienung",
+            "Ladegerät", "Akku", "Strom", "Herd", "Kühlschrank", "Spüle", "Mikrowelle", "Wasserkocher", "Steckdose", "Vorhang",
+            "Föhn", "Rasierer", "Lautsprecher", "Monitor", "Tastatur", "Maus", "Kabel", "Kamera", "Karton", "Mülltonne",
+            "Brief", "Umschlag", "Kugelschreiber", "Heft", "Ordner", "Schultasche", "Zettel", "Lineal", "Notizbuch", "Textmarker",
+            "Plakat", "Pflanze", "Topf", "Schaufel", "Eimer", "Gießkanne", "Karton", "Glas", "Dose", "Flasche",
+            "Schlüsselbund", "Klingel", "Straßenlaterne", "Zebrastreifen", "Ampel", "Bushaltestelle", "Rucksack", "Trinkflasche", "Haargummi", "Nagellack",
+             "Schraube", "Drucker", "Kassenzettel", "Stempel", "Einkaufswagen", "Treppe", "Balkon", "Heizung", "Lüfter", "Teekanne",
+             "Schneebesen", "Backblech", "Mixer", "Pfanne", "Kochtopf", "Strohhalm", "Trichter", "Sonnenbrille", "Kamm", "Zange", "Beamer", "USB-Stick", "Lautsprecher", "Smartwatch", "Powerbank", "Router", "Webcam", "Mikrofon", "Drohne", "Tablet",
+             "Scanner", "Headset", "Joystick", "Grafiktablet", "Laserdrucker", "Ladepad", "Blu-ray", "Netzteil", "Monitor", "Mauspad",
+             "Joghurt", "Toilettenpapier", "Spülmittel", "Bonbon", "Kekse", "Frischkäse", "Tiefkühlpizza", "Kaugummi", "Wassermelone", "Nudeln",
+             "Reis", "Ketchup", "Mayo", "Butter", "Honig", "Saft", "Putzmittel", "Zahnpasta", "Haarspray", "Kochschinken",
+              "Atlas", "Füller", "Pausenbrot", "Bleistiftanspitzer", "Radiergummi", "Weltkarte", "Hefter", "Tafel", "Kreide", "Schulbuch",
+              "Tintenpatrone", "Winkelmesser", "Textmarker", "Schulranzen", "Collegeblock", "Lehrerpult", "Lineal", "Tintenroller", "Tischtennisball", "Kopfhörer"],
+  "Marken": ["Nike", "Adidas", "Puma", "Apple", "Samsung", "Sony", "BMW", "Mercedes", "Audi", "Volkswagen",
+           "Tesla", "IKEA", "McDonald's", "Coca-Cola", "Pepsi", "Red Bull", "Google", "Amazon", "Netflix", "LEGO",
+            "PlayStation", "Xbox", "Nespresso", "Nutella", "Haribo", "Nivea", "Zara", "H&M", "Lidl", "Aldi",
+            "Spotify", "TikTok", "Instagram", "YouTube", "Facebook", "Nestlé", "Ferrero", "Bosch", "Siemens", "Philips",
+            "Rewe", "Edeka", "Subway", "Starbucks", "Balenciaga", "Gucci", "Louis Vuitton", "Rolex", "Ritter Sport", "Dr. Oetker",
+            "Google Maps", "Telegram", "Snapchat", "WhatsApp", "Twitch", "CapCut", "BeReal", "Pinterest", "Uber", "Steam",
+            "Nike Air", "Jordan", "Converse", "Vans", "Crocs", "Birkenstock", "Skechers", "Under Armour", "New Balance", "Asics",
+            "Dell", "HP", "Lenovo", "Acer", "Huawei", "Oppo", "OnePlus", "Xiaomi", "Nikon", "Canon",
+             "EA Sports", "Ubisoft", "Rockstar Games", "Epic Games", "Blizzard", "Nintendo", "SEGA", "Bandai Namco", "Activision", "Valve",
+            "Maggi", "Milka", "Oreo", "Chips Ahoy", "Pringles", "Ben & Jerry’s", "Langnese", "Iglo", "Müller", "Philadelphia",
+            "Kaufland", "Decathlon", "MediaMarkt", "Saturn", "dm", "Rossmann", "Tchibo", "Depot", "Douglas", "Hornbach"],
+ "Berufe": ["Arzt", "Lehrer", "Polizist", "Feuerwehrmann", "Pilot", "Koch", "Bäcker", "Friseur", "Mechaniker", "Programmierer",
+            "Ingenieur", "Designer", "Elektriker", "Krankenschwester", "Pfleger", "Zahnarzt", "Anwalt", "Richter", "Bauarbeiter",
+            "Verkäufer", "Musiker", "Schauspieler", "YouTuber", "Influencer", "Journalist", "Wissenschaftler", "Psychologe",
+            "Architekt", "Hausmeister", "Tierarzt", "Fotograf", "Fitnesscoach", "Landwirt", "Künstler", "Busfahrer", "Taxifahrer",
+            "Postbote", "Notar", "Therapeut", "Immobilienmakler", "Tänzer", "Sänger", "Schriftsteller", "Dolmetscher", "Sekretär"],
+"Tiere": ["Hund", "Katze", "Löwe", "Tiger", "Elefant", "Affe", "Bär", "Zebra", "Giraffe", "Krokodil",
+                "Känguru", "Nilpferd", "Pinguin", "Koala", "Fuchs", "Wolf", "Adler", "Eule", "Schlange",
+                "Kaninchen", "Hamster", "Pferd", "Schaf", "Kuh", "Huhn", "Ente", "Fisch", "Hai", "Delfin",
+                "Tintenfisch", "Papagei", "Taube", "Maus", "Igel", "Waschbär", "Marder", "Pfau", "Truthahn", "Alpaka"],
+"Länder/Städte": ["Deutschland", "Frankreich", "Italien", "Spanien", "Portugal", "USA", "Kanada", "Brasilien", "Argentinien",
+                "Japan", "China", "Südkorea", "Russland", "Australien", "Indien", "Ägypten", "Marokko", "Südafrika", "Mexiko",
+                "Berlin", "Paris", "London", "Rom", "Madrid", "New York", "Los Angeles", "Toronto", "Sydney", "Rio de Janeiro",
+                "Kapstadt", "Mumbai", "Peking", "Seoul", "Istanbul", "Amsterdam", "Wien", "Zürich", "Athen", "Oslo", "Dubai", "Seoul", "Bangkok", "Buenos Aires", "Kairo", "Hanoi", "Jakarta", "Tel Aviv", "Doha", "Helsinki",
+                "Prag", "Dublin", "Lissabon", "Reykjavík", "Montevideo", "Wellington", "Abu Dhabi", "Osaka", "Chicago", "San Francisco"],
+"Essen & Trinken": ["Pizza", "Burger", "Pommes", "Spaghetti", "Sushi", "Curry", "Döner", "Falafel", "Lasagne", "Hotdog",
+                "Croissant", "Torte", "Eis", "Schokolade", "Käse", "Toast", "Kuchen", "Pfannkuchen", "Gulasch", "Chili con Carne",
+                "Cola", "Wasser", "Eistee", "Bier", "Wein", "Cocktail", "Smoothie", "Fanta", "Kaffee", "Tee"],
+"Filme oder Serien": ["Harry Potter", "Avengers", "Titanic", "Star Wars", "Stranger Things", "Breaking Bad", "Wednesday", "Barbie",
+                "The Mandalorian", "Squid Game", "House of the Dragon", "The Boys", "The Crown", "Peaky Blinders", "Loki", "The Flash",
+                "Fast and Furious", "The Simpsons", "Rick and Morty", "Friends", "How I Met Your Mother", "Game of Thrones",
+                "Shrek", "Kung Fu Panda", "Spiderman", "Batman", "Frozen", "Moana", "Encanto", "Oppenheimer", "Attack on Titan", "Demon Slayer", "One Piece", "Jujutsu Kaisen", "Chainsaw Man", "Naruto", "My Hero Academia",
+                "Arcane", "Avatar – Der Herr der Elemente", "Invincible", "Stranger Things", "Wednesday", "Euphoria", "The Last of Us",
+                "Dark", "Money Heist", "You", "Outer Banks", "XO, Kitty", "The Queen's Gambit"],
+                "Sportarten": ["Fußball", "Basketball", "Tennis", "Boxen", "Volleyball", "Handball", "Schwimmen", "Leichtathletik", "Turnen",
+                "Golf", "Eishockey", "Baseball", "Cricket", "Skifahren", "Snowboarden", "Rudern", "Klettern", "Surfen", "Reiten", "Tischtennis", "Klettern", "Skaten", "Breakdance", "Parkour", "Rugby", "E-Sport", "Fechten", "Bogenschießen",
+                "Synchronschwimmen", "Trampolinspringen", "BMX", "Baseball", "Motorsport", "Biathlon", "Curling",
+                "Lacrosse", "Wasserspringen", "Kickboxen", "Squash", "Windsurfen"],
+"Kampfsportler": ["Conor McGregor", "Khabib Nurmagomedov", "Mike Tyson", "Muhammad Ali", "Bruce Lee", "Floyd Mayweather",
+                "Logan Paul", "Jake Paul", "Anderson Silva", "Ronda Rousey", "Israel Adesanya", "Tyson Fury", "Francis Ngannou",
+                "Jon Jones", "Chuck Norris", "Alex Pereira", "Sean O'Malley", "Ilia Topuria", "Leon Edwards", "Islam Makhachev", "Tom Aspinall",
+                "Merab Dvalishvili", "Alexa Grasso", "Zhang Weili", "Patty Pimblett", "Bo Nickal", "Kamaru Usman",
+                "Aljamain Sterling", "Canelo Álvarez", "Deontay Wilder", "Jake Paul", "Logan Paul", "Ryan Garcia",
+                "Israel Adesanya", "Shavkat Rakhmonov"],
+"Fußballer": [ "Lionel Messi", "Cristiano Ronaldo", "Kylian Mbappé", "Erling Haaland", "Robert Lewandowski", "Neymar",
+                 "Toni Kroos", "Luka Modrić", "Karim Benzema", "Kevin De Bruyne", "Mohamed Salah", "Harry Kane", "Thomas Müller",
+                 "Sadio Mané", "Joshua Kimmich", "Manuel Neuer", "Marc-André ter Stegen", "Jude Bellingham", "Vinicius Jr.",
+                 "Jamal Musiala", "Lamine Yamal", "Xavi Simons", "Alejandro Garnacho", "Endrick", "Pedri", "Gavi", "Florian Wirtz", "Rasmus Højlund",
+                 "João Félix", "Phil Foden", "Declan Rice", "Martin Ødegaard", "Bukayo Saka", "Josko Gvardiol", "Khvicha Kvaratskhelia",
+                 "Dominik Szoboszlai", "Álex Grimaldo", "Victor Osimhen", "Enzo Fernández", "Jérémy Doku"],
+"Hobbys": [ "Lesen", "Zeichnen", "Musik hören", "Videospiele", "Schreiben", "Kochen", "Backen", "Sport treiben", "Joggen",
+                 "Wandern", "Reiten", "Fotografieren", "Filme schauen", "Tanzen", "Schwimmen", "Fahrradfahren", "Yoga", "Gärtnern",
+                 "Stricken", "Nähen", "Longboard fahren", "Podcasts hören", "Meditieren", "Kalligrafie", "Geocaching", "Graffiti", "Beatboxen",
+                 "Drohne fliegen", "Cosplay", "Escape Rooms", "Origami", "Schauspiel", "Improvisation", "Mixology", "Bouldern",
+                 "Astronomie", "Aquaristik", "Comics sammeln", "Tischspiele spielen", "Fischen"],
+"Videospiele": [ "Minecraft", "Fortnite", "FIFA", "GTA V", "Call of Duty", "Among Us", "Roblox", "League of Legends",
+                 "Valorant", "CS:GO", "The Sims", "Zelda", "Mario Kart", "Animal Crossing", "PUBG", "Overwatch", "Rocket League",
+                 "Clash Royale", "Brawl Stars", "Pokémon Go", "Elden Ring", "Hogwarts Legacy", "The Legend of Zelda: Tears of the Kingdom", "Super Mario Odyssey",
+                 "Red Dead Redemption 2", "Cyberpunk 2077", "The Witcher 3", "Resident Evil 4", "God of War Ragnarök",
+                 "Apex Legends", "Genshin Impact", "Fall Guys", "Hades", "Dead by Daylight", "Stardew Valley", "Warzone",
+                 "Battlefield", "Dota 2", "Honkai: Star Rail", "Five Nights at Freddy's"],
+"Apps": ["Instagram", "TikTok", "WhatsApp", "YouTube", "Spotify", "Snapchat", "Google Maps", "Amazon", "Netflix",
+          "Twitter", "Facebook", "Telegram", "Discord", "Zoom", "Teams", "Google Drive", "eBay", "Klarna", "Pinterest", "Reddit", "BeReal", "CapCut", "Duolingo", "ChatGPT", "Shazam", "GoodNotes", "Notion", "Blitz", "Twitch", "Depop",
+          "Too Good To Go", "Yuka", "Airbnb", "Tinder", "Jodel", "OneFootball", "Telegram", "Google Photos", "Steam", "Uber"],
+    "Schulfächer": ["Mathematik", "Deutsch", "Englisch", "Biologie", "Physik", "Chemie", "Geschichte", "Erdkunde", "Informatik", "Sport",
+                 "Musik", "Kunst", "Religion", "Ethik", "Wirtschaft", "Politik", "Philosophie", "Spanisch", "Französisch", "Latein",
+                 "Technik", "Sozialwissenschaften", "Darstellen und Gestalten", "Hauswirtschaft", "Gesundheit"],
+    "Fantasiefiguren": ["Drache", "Vampir", "Einhorn", "Zauberer", "Hexe", "Meerjungfrau", "Geist", "Kobold", "Troll", "Elf",
+                       "Feuerdämon", "Werwolf", "Zombie", "Phönix", "Riese", "Schneemonster", "Dämon", "Ork", "Golem", "Greif",
+                       "Zyklop", "Centaur", "Pegasus", "Dschinn", "Skelettkrieger"],
+
+    };
+
+    let assignedWords = {};
+    let impostors = [];
+    let gameStarted = false;
+
+    document.getElementById("toggleCategoryButton").addEventListener("click", function (e) {
+      e.stopPropagation();
+      const dropdown = this.parentElement;
+      dropdown.classList.toggle("open");
+    });
+
+    document.addEventListener("click", function (e) {
+      const dropdown = document.querySelector(".category-dropdown");
+      if (!dropdown.contains(e.target)) {
+        dropdown.classList.remove("open");
+      }
+    });
+
+    document.getElementById("selectAll").addEventListener("change", function () {
+      const checks = document.querySelectorAll(".cat-check");
+      checks.forEach(cb => cb.checked = this.checked);
+    });
+
+    function getSelectedCategories() {
+      const checks = document.querySelectorAll(".cat-check:checked");
+      let words = [];
+      checks.forEach(cb => words = words.concat(categories[cb.value] || []));
+      return words;
+    }
+
+    function addPlayer() {
+      const name = document.getElementById("playerName").value.trim();
+      if (name && !players.includes(name)) {
+        players.push(name);
+        displayPlayers();
+        document.getElementById("playerName").value = "";
+      }
+    }
+
+    function removePlayer(name) {
+      const index = players.indexOf(name);
+      if (index !== -1) {
+        players.splice(index, 1);
+        displayPlayers();
+      }
+    }
+
+    function displayPlayers() {
+      const playerList = document.getElementById("playerList");
+      playerList.innerHTML = "";
+      players.forEach(name => {
+        const container = document.createElement("div");
+        const btn = document.createElement("button");
+        btn.textContent = name;
+        btn.onclick = () => {
+          if (gameStarted) {
+            toggleWord(name, btn);
+          }
+        };
+        container.appendChild(btn);
+        if (!gameStarted) {
+          const remove = document.createElement("button");
+          remove.textContent = "×";
+          remove.className = "remove-btn";
+          remove.onclick = (e) => {
+            e.stopPropagation();
+            removePlayer(name);
+          };
+          container.appendChild(remove);
+        }
+        playerList.appendChild(container);
+      });
+    }
+
+    function startGame() {
+      const impostorCount = parseInt(document.getElementById("impostorCount").value);
+      const wordPool = getSelectedCategories();
+
+      if (players.length < 3) {
+        alert("Mindestens 3 Spieler erforderlich.");
+        return;
+      }
+      if (wordPool.length === 0) {
+        alert("Bitte mindestens eine Kategorie auswählen.");
+        return;
+      }
+      if (impostorCount >= players.length) {
+        alert("Impostor-Anzahl muss kleiner als Spieleranzahl sein.");
+        return;
+      }
+
+      assignedWords = {};
+      impostors = [];
+      gameStarted = true;
+
+      const selectedWord = wordPool[Math.floor(Math.random() * wordPool.length)];
+      const shuffled = [...players].sort(() => Math.random() - 0.5);
+      impostors = shuffled.slice(0, impostorCount);
+
+      for (const name of players) {
+        assignedWords[name] = impostors.includes(name) ? "IMPOSTOR" : selectedWord;
+      }
+
+      displayPlayers();
+      alert("Wörter wurden verteilt! Klicke auf deinen Namen, um dein Wort zu sehen.");
+    }
+
+    function toggleWord(name, button) {
+      if (button.classList.contains("word-box")) {
+        displayPlayers();
+      } else if (assignedWords[name]) {
+        const wordBox = document.createElement("div");
+        wordBox.className = "word-box";
+        wordBox.textContent = assignedWords[name];
+        wordBox.onclick = () => toggleWord(name, wordBox);
+        button.replaceWith(wordBox);
+      }
+    }
+
+    function resetGame() {
+      assignedWords = {};
+      impostors = [];
+      gameStarted = false;
+      players.sort(() => Math.random() - 0.5);
+      displayPlayers();
+      document.getElementById("impostorCount").value = 1;
+    }
+  </script>
+</body>
+</html>
  </body>
  </html>
