@@ -124,9 +124,17 @@
       }
     }
   </style>
+  <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 </head>
 <body>
   <h1>Finde den Impostor</h1>
+ 
+<div id="modeSelection">
+  <button onclick="showOffline()">Offline spielen</button>
+  <button onclick="showOnline()">Online spielen</button>
+</div>
+<div id="offlineSection" style="display:none;">
+
 
   <div class="controls-top">
     <input type="text" id="playerName" placeholder="Dein Name">
@@ -165,8 +173,53 @@
 
   <div class="player-list" id="playerList"></div>
 
+</div>
+<div id="onlineMenu" style="display:none;">
+  <button onclick="createRoom()">Raum erstellen</button>
+  <button onclick="joinRoom()">Raum beitreten</button>
+</div>
+
+<div id="onlineLobby" style="display:none;">
+  <div>Raumcode: <span id="roomCodeDisplay"></span></div>
+  <div class="controls-top">
+    <input type="number" id="onlineImpostorCount" min="1" value="1" style="display:none;">
+    <span id="onlineImpostorLabel" style="display:none;background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
+    <div class="category-dropdown" id="onlineCategoryDropdown" style="display:none;">
+      <button id="onlineToggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
+      <div class="dropdown-content" id="onlineCategoryOptions">
+        <label>Alle <input type="checkbox" id="onlineSelectAll"></label>
+        <label>Allgemein <input type="checkbox" class="cat-check-online" value="Allgemein"></label>
+        <label>Berufe <input type="checkbox" class="cat-check-online" value="Berufe"></label>
+        <label>Tiere <input type="checkbox" class="cat-check-online" value="Tiere"></label>
+        <label>Länder/Städte <input type="checkbox" class="cat-check-online" value="Länder/Städte"></label>
+        <label>Essen & Trinken <input type="checkbox" class="cat-check-online" value="Essen & Trinken"></label>
+        <label>Filme oder Serien <input type="checkbox" class="cat-check-online" value="Filme oder Serien"></label>
+        <label>Sportarten <input type="checkbox" class="cat-check-online" value="Sportarten"></label>
+        <label>Kampfsportler <input type="checkbox" class="cat-check-online" value="Kampfsportler"></label>
+        <label>Fußballer <input type="checkbox" class="cat-check-online" value="Fußballer"></label>
+        <label>Hobbys <input type="checkbox" class="cat-check-online" value="Hobbys"></label>
+        <label>Videospiele <input type="checkbox" class="cat-check-online" value="Videospiele"></label>
+        <label>Apps <input type="checkbox" class="cat-check-online" value="Apps"></label>
+        <label>Marken <input type="checkbox" class="cat-check-online" value="Marken"></label>
+        <label>Schulfächer <input type="checkbox" class="cat-check-online" value="Schulfächer"></label>
+        <label>Fantasiefiguren <input type="checkbox" class="cat-check-online" value="Fantasiefiguren"></label>
+      </div>
+    </div>
+  </div>
+  <div class="controls-bottom">
+    <button onclick="startOnlineGame()" id="onlineStartBtn" style="display:none;">Start</button>
+    <button onclick="resetOnlineGame()">Reset</button>
+  </div>
+  <div class="player-list" id="onlinePlayerList"></div>
+</div>
+
   <script>
     const players = [];
+let online=false;
+let socket=null;
+let roomCode="";
+let myName="";
+let isHost=false;
     const categories = {
  "Allgemein": [  "Stuhl", "Tisch", "Lampe", "Auto", "Fahrrad", "Buch", "Handy", "Schlüssel", "Fenster", "Tür",
             "Kissen", "Uhr", "Brille", "Schuh", "Jacke", "Rucksack", "Tasse", "Löffel", "Bleistift", "Kamera",
@@ -384,6 +437,129 @@
       displayPlayers();
       document.getElementById("impostorCount").value = 1;
     }
+function showOffline(){
+  document.getElementById('modeSelection').style.display='none';
+  document.getElementById('offlineSection').style.display='block';
+}
+
+function showOnline(){
+  document.getElementById('modeSelection').style.display='none';
+  document.getElementById('onlineMenu').style.display='block';
+}
+
+function createRoom(){
+  myName = prompt('Dein Name?');
+  if(!myName) return;
+  socket = io();
+  socket.emit('createRoom',{name:myName},({code})=>{
+    roomCode=code;
+    isHost=true;
+    online=true;
+    document.getElementById('roomCodeDisplay').textContent=code;
+    document.getElementById('onlineMenu').style.display='none';
+    document.getElementById('onlineLobby').style.display='block';
+    document.getElementById('onlineImpostorCount').style.display='inline-block';
+    document.getElementById('onlineImpostorLabel').style.display='inline-block';
+    document.getElementById('onlineCategoryDropdown').style.display='inline-block';
+    document.getElementById('onlineStartBtn').style.display='inline-block';
+  });
+  setupSocket();
+}
+
+function joinRoom(){
+  roomCode = prompt('Raumcode?');
+  myName = prompt('Dein Name?');
+  if(!roomCode || !myName) return;
+  socket = io();
+  socket.emit('joinRoom',{code:roomCode,name:myName},(res)=>{
+    if(res && res.error){ alert(res.error); return; }
+    online=true;
+    isHost=false;
+    document.getElementById('roomCodeDisplay').textContent=roomCode;
+    document.getElementById('onlineMenu').style.display='none';
+    document.getElementById('onlineLobby').style.display='block';
+  });
+  setupSocket();
+}
+
+function setupSocket(){
+  socket.on('playerList',names=>{
+    players.length=0;
+    players.push(...names);
+    displayPlayersOnline();
+  });
+  socket.on('wordAssignment',({word})=>{
+    assignedWords[myName]=word;
+    showWordOverlay(word);
+  });
+  socket.on('gameStarted',()=>{
+    gameStarted=true;
+    displayPlayersOnline();
+  });
+}
+
+function displayPlayersOnline(){
+  const list=document.getElementById('onlinePlayerList');
+  if(!list) return;
+  list.innerHTML='';
+  players.forEach(n=>{
+    const c=document.createElement('div');
+    const b=document.createElement('button');
+    b.textContent=n;
+    if(n===myName){
+      b.onclick=()=>{ if(assignedWords[n]) showWordOverlay(assignedWords[n]); };
+    }
+    c.appendChild(b);
+    list.appendChild(c);
+  });
+}
+
+function showWordOverlay(word){
+  const o=document.createElement('div');
+  o.style.position='fixed';
+  o.style.top='0';
+  o.style.left='0';
+  o.style.right='0';
+  o.style.bottom='0';
+  o.style.background='#fff';
+  o.style.display='flex';
+  o.style.alignItems='center';
+  o.style.justifyContent='center';
+  o.style.fontSize='2em';
+  o.textContent=word;
+  o.onclick=()=>o.remove();
+  document.body.appendChild(o);
+}
+
+function getSelectedCategoriesOnline(){
+  const checks=document.querySelectorAll('#onlineCategoryOptions .cat-check-online:checked');
+  return Array.from(checks).map(cb=>cb.value);
+}
+
+function startOnlineGame(){
+  const impostorCount=parseInt(document.getElementById('onlineImpostorCount').value);
+  const cats=getSelectedCategoriesOnline();
+  let wordPool=[];
+  cats.forEach(c=>wordPool=wordPool.concat(categories[c]||[]));
+  if(players.length<3){alert('Mindestens 3 Spieler erforderlich.');return;}
+  if(wordPool.length===0){alert('Bitte mindestens eine Kategorie auswählen.');return;}
+  if(impostorCount>=players.length){alert('Impostor-Anzahl muss kleiner als Spieleranzahl sein.');return;}
+  const selectedWord=wordPool[Math.floor(Math.random()*wordPool.length)];
+  const shuffled=[...players].sort(()=>Math.random()-0.5);
+  const imps=shuffled.slice(0,impostorCount);
+  assignedWords={};
+  players.forEach(n=>{assignedWords[n]=imps.includes(n)?'IMPOSTOR':selectedWord;});
+  socket.emit('startGame',{code:roomCode,assignments:assignedWords});
+}
+
+function resetOnlineGame(){
+  if(socket) socket.disconnect();
+  location.reload();
+}
+
+document.getElementById('onlineToggleCategoryButton').addEventListener('click',function(e){e.stopPropagation();this.parentElement.classList.toggle('open');});
+document.addEventListener('click',function(e){const d=document.getElementById('onlineCategoryDropdown');if(d&&!d.contains(e.target))d.classList.remove('open');});
+document.getElementById('onlineSelectAll').addEventListener('change',function(){document.querySelectorAll('.cat-check-online').forEach(cb=>cb.checked=this.checked);});
   </script>
 </body>
 </html>
