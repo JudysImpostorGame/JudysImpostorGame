@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rechnungs App für KFZ Werkstatt</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background-color: #f2f2f2; }
+    input[type='number'] { width: 80px; }
+    input[type='text'] { width: 100%; }
+    .right { text-align: right; }
+    #totals { margin-top: 20px; text-align: right; }
+    button { padding: 8px 12px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+<h1>Rechnung erstellen</h1>
+<div>
+  <label>Rechnungsnummer: <input type="text" id="invoiceNumber"></label><br>
+  <label>Datum: <input type="date" id="invoiceDate"></label><br>
+  <label>Kunde: <input type="text" id="customer"></label>
+</div>
+
+<table id="items">
+  <thead>
+    <tr>
+      <th>Beschreibung</th>
+      <th>Menge</th>
+      <th>Preis (€/Einheit)</th>
+      <th>Gesamt</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
+</table>
+<button id="addItem">Position hinzufügen</button>
+
+<div id="totals">
+  <div>Zwischensumme: <span id="subtotal">0.00</span> €</div>
+  <div>Umsatzsteuer (19%): <span id="tax">0.00</span> €</div>
+  <div><strong>Gesamtbetrag: <span id="total">0.00</span> €</strong></div>
+</div>
+<button onclick="window.print()">Drucken</button>
+
+<script>
+function addRow(desc = '', qty = 1, price = 0) {
+  const tbody = document.querySelector('#items tbody');
+  const row = document.createElement('tr');
+  row.innerHTML = `
+    <td><input type="text" class="desc" value="${desc}"></td>
+    <td><input type="number" class="qty" min="0" value="${qty}"></td>
+    <td><input type="number" class="price" min="0" step="0.01" value="${price}"></td>
+    <td class="line-total right">0.00</td>
+    <td><button class="remove">Entfernen</button></td>
+  `;
+  tbody.appendChild(row);
+  updateRow(row);
+  row.querySelectorAll('input').forEach(input => {
+    input.addEventListener('input', () => updateRow(row));
+  });
+  row.querySelector('.remove').addEventListener('click', () => {
+    row.remove();
+    updateTotals();
+  });
+}
+
+function updateRow(row) {
+  const qty = parseFloat(row.querySelector('.qty').value) || 0;
+  const price = parseFloat(row.querySelector('.price').value) || 0;
+  const total = qty * price;
+  row.querySelector('.line-total').textContent = total.toFixed(2);
+  updateTotals();
+}
+
+function updateTotals() {
+  const rows = document.querySelectorAll('#items tbody tr');
+  let subtotal = 0;
+  rows.forEach(row => {
+    subtotal += parseFloat(row.querySelector('.line-total').textContent) || 0;
+  });
+  const tax = subtotal * 0.19;
+  const total = subtotal + tax;
+  document.getElementById('subtotal').textContent = subtotal.toFixed(2);
+  document.getElementById('tax').textContent = tax.toFixed(2);
+  document.getElementById('total').textContent = total.toFixed(2);
+}
+
+document.getElementById('addItem').addEventListener('click', () => addRow());
+addRow();
+</script>
+</body>
+</html>
