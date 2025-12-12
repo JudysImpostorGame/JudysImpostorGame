@@ -1,391 +1,778 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Finde den Impostor</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>2.5D Mobile Shooter</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #b3e5fc;
-      text-align: center;
-      padding: 20px;
+    html, body { margin:0; height:100%; background:#070a10; overflow:hidden; touch-action:none; }
+    canvas { display:block; width:100vw; height:100vh; }
+    .hud{
+      position:fixed; top:12px; left:12px; right:12px;
+      display:flex; justify-content:space-between; align-items:flex-start; gap:10px;
+      color:#e6edf3; font:14px system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      background:rgba(20,25,35,0.55); padding:10px 12px; border-radius:12px; backdrop-filter: blur(6px);
+      user-select:none; pointer-events:none;
     }
-    h1 {
-      font-size: 2.5em;
-      color: #0288d1;
-      margin-bottom: 20px;
+    .hud small{ display:block; opacity:0.85; margin-top:4px; font-size:12px; line-height:1.25; }
+    .btn{
+      position:fixed; top:12px; right:12px;
+      padding:10px 12px; border-radius:12px;
+      background:rgba(20,25,35,0.55); color:#e6edf3;
+      font:14px system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      border:1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(6px);
     }
-    .controls-top {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 10px;
+    .joy {
+      position:fixed; bottom:22px; width:160px; height:160px;
+      border-radius:50%;
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.10);
+      backdrop-filter: blur(6px);
+      touch-action:none;
     }
-    .controls-top input, .controls-top button, .controls-top label {
-      font-size: 1.1em;
-      min-width: 120px;
+    .joy.left { left:18px; }
+    .knob{
+      position:absolute; left:50%; top:50%;
+      width:66px; height:66px; margin-left:-33px; margin-top:-33px;
+      border-radius:50%;
+      background:rgba(150,210,255,0.22);
+      border:1px solid rgba(150,210,255,0.25);
+      box-shadow:0 10px 26px rgba(0,0,0,0.35);
     }
-    #impostorCount {
-      width: 60px;
-      text-align: center;
+    .overlay{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(0,0,0,0.55); color:#f0f6ff;
+      font:700 38px system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      user-select:none;
     }
-    .controls-bottom {
-      margin-bottom: 20px;
-    }
-    .category-dropdown {
-      position: relative;
-      display: inline-block;
-    }
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      background-color: #fff;
-      min-width: 220px;
-      border: 2px solid #0288d1;
-      border-radius: 10px;
-      padding: 10px;
-      z-index: 1;
-      max-height: 300px;
-      overflow-y: auto;
-      text-align: left;
-    }
-    .category-dropdown.open .dropdown-content {
-      display: block;
-    }
-    .dropdown-content label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 5px 0;
-      font-size: 0.95em;
-    }
-    input, button, select {
-      padding: 10px;
-      border-radius: 10px;
-      border: 2px solid #0288d1;
-      font-size: 1em;
-      font-family: inherit;
-    }
-    .player-list {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 15px;
-      margin-top: 20px;
-    }
-    .player-list > div {
-      position: relative;
-    }
-    .player-list button {
-      background-color: white;
-      cursor: pointer;
-      padding: 12px 20px;
-      border-radius: 10px;
-      border: 2px solid #0288d1;
-      font-size: 1.1em;
-      font-family: inherit;
-    }
-    .remove-btn {
-      position: absolute;
-      top: -12px;
-      right: -12px;
-      background: #ff0000;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      width: 26px;
-      height: 26px;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-      font-family: inherit;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .word-box {
-      padding: 12px 20px;
-      background-color: #ffffff;
-      border: 2px solid #00796b;
-      border-radius: 10px;
-      font-weight: bold;
-      font-size: 1.2em;
-      color: #00796b;
-      font-family: inherit;
-      cursor: pointer;
-    }
-    @media (max-width: 600px) {
-      .controls-top {
-        flex-direction: column;
-        gap: 8px;
-      }
+    .overlay small{
+      display:block; margin-top:14px; font:14px system-ui, -apple-system, Segoe UI, Roboto, Arial; opacity:0.9; font-weight:500;
+      text-align:center;
     }
   </style>
 </head>
 <body>
-  <h1>Finde den Impostor</h1>
-
-  <div class="controls-top">
-    <input type="text" id="playerName" placeholder="Dein Name">
-    <button onclick="addPlayer()">Hinzufügen</button>
-    <div style="display: flex; align-items: center; gap: 5px;">
-      <input type="number" id="impostorCount" min="1" value="1">
-      <span style="background-color: white; padding: 6px 12px; border-radius: 10px; border: 2px solid #0288d1;">🔍 Impostors</span>
+  <div class="hud">
+    <div>
+      <b>Score</b>: <span id="score">0</span> | <b>Leben</b>: <span id="hp">100</span> | <b>Welle</b>: <span id="wave">1</span>
+      <small>Joystick: hoch runter, Auto Aim, Auto Schuss</small>
     </div>
-    <div class="category-dropdown">
-      <button id="toggleCategoryButton" style="background-color: white; border: 2px solid #0288d1; border-radius: 10px; padding: 10px; cursor: pointer;">Kategorie(n) wählen</button>
-      <div class="dropdown-content" id="categoryOptions">
-        <label>Alle <input type="checkbox" id="selectAll"></label>
-        <label>Allgemein <input type="checkbox" class="cat-check" value="Allgemein"></label>
-        <label>Berufe <input type="checkbox" class="cat-check" value="Berufe"></label>
-        <label>Tiere <input type="checkbox" class="cat-check" value="Tiere"></label>
-        <label>Länder/Städte <input type="checkbox" class="cat-check" value="Länder/Städte"></label>
-        <label>Essen & Trinken <input type="checkbox" class="cat-check" value="Essen & Trinken"></label>
-        <label>Filme oder Serien <input type="checkbox" class="cat-check" value="Filme oder Serien"></label>
-        <label>Sportarten <input type="checkbox" class="cat-check" value="Sportarten"></label>
-        <label>Kampfsportler <input type="checkbox" class="cat-check" value="Kampfsportler"></label>
-        <label>Fußballer <input type="checkbox" class="cat-check" value="Fußballer"></label>
-        <label>Hobbys <input type="checkbox" class="cat-check" value="Hobbys"></label>
-        <label>Videospiele <input type="checkbox" class="cat-check" value="Videospiele"></label>
-        <label>Apps <input type="checkbox" class="cat-check" value="Apps"></label>
-        <label>Marken <input type="checkbox" class="cat-check" value="Marken"></label>
-        <label>Schulfächer <input type="checkbox" class="cat-check" value="Schulfächer"></label>
-        <label>Fantasiefiguren <input type="checkbox" class="cat-check" value="Fantasiefiguren"></label>
-     </div>
+    <div style="text-align:right">
+      <small>Seitlich 2.5D</small>
+      <small>wenig Gegner, langsamer</small>
     </div>
   </div>
 
-  <div class="controls-bottom">
-    <button onclick="startGame()">Start</button>
-    <button onclick="resetGame()">Reset</button>
-  </div>
+  <button class="btn" id="restart">Neustart</button>
 
-  <div class="player-list" id="playerList"></div>
+  <div class="joy left" id="joyL"><div class="knob" id="knobL"></div></div>
+  <div class="overlay" id="over">Game Over<small>Tippe Neustart</small></div>
 
-  <script>
-    const players = [];
-    const categories = {
- "Allgemein": [  "Stuhl", "Tisch", "Lampe", "Auto", "Fahrrad", "Buch", "Handy", "Schlüssel", "Fenster", "Tür",
-            "Kissen", "Uhr", "Brille", "Schuh", "Jacke", "Rucksack", "Tasse", "Löffel", "Bleistift", "Kamera",
-             "Spiegel", "Waschmaschine", "Fernseher", "Laptop", "Regenschirm", "Zahnbürste", "Seife", "Koffer", "Ball", "Kerze",
-            "Toilette", "Bett", "Decke", "Treppe", "Schrank", "Teppich", "Bild", "Geld", "Messer", "Schere",
-            "Nagel", "Hammer", "Papier", "Lineal", "Kleber", "Radiergummi", "Besen", "Spülmaschine", "Lichtschalter", "Fernbedienung",
-            "Ladegerät", "Akku", "Strom", "Herd", "Kühlschrank", "Spüle", "Mikrowelle", "Wasserkocher", "Steckdose", "Vorhang",
-            "Föhn", "Rasierer", "Lautsprecher", "Monitor", "Tastatur", "Maus", "Kabel", "Kamera", "Karton", "Mülltonne",
-            "Brief", "Umschlag", "Kugelschreiber", "Heft", "Ordner", "Schultasche", "Zettel", "Lineal", "Notizbuch", "Textmarker",
-            "Plakat", "Pflanze", "Topf", "Schaufel", "Eimer", "Gießkanne", "Karton", "Glas", "Dose", "Flasche",
-            "Schlüsselbund", "Klingel", "Straßenlaterne", "Zebrastreifen", "Ampel", "Bushaltestelle", "Rucksack", "Trinkflasche", "Haargummi", "Nagellack",
-             "Schraube", "Drucker", "Kassenzettel", "Stempel", "Einkaufswagen", "Treppe", "Balkon", "Heizung", "Lüfter", "Teekanne",
-             "Schneebesen", "Backblech", "Mixer", "Pfanne", "Kochtopf", "Strohhalm", "Trichter", "Sonnenbrille", "Kamm", "Zange", "Beamer", "USB-Stick", "Lautsprecher", "Smartwatch", "Powerbank", "Router", "Webcam", "Mikrofon", "Drohne", "Tablet",
-             "Scanner", "Headset", "Joystick", "Grafiktablet", "Laserdrucker", "Ladepad", "Blu-ray", "Netzteil", "Monitor", "Mauspad",
-             "Joghurt", "Toilettenpapier", "Spülmittel", "Bonbon", "Kekse", "Frischkäse", "Tiefkühlpizza", "Kaugummi", "Wassermelone", "Nudeln",
-             "Reis", "Ketchup", "Mayo", "Butter", "Honig", "Saft", "Putzmittel", "Zahnpasta", "Haarspray", "Kochschinken",
-              "Atlas", "Füller", "Pausenbrot", "Bleistiftanspitzer", "Radiergummi", "Weltkarte", "Hefter", "Tafel", "Kreide", "Schulbuch",
-              "Tintenpatrone", "Winkelmesser", "Textmarker", "Schulranzen", "Collegeblock", "Lehrerpult", "Lineal", "Tintenroller", "Tischtennisball", "Kopfhörer"],
-  "Marken": ["Nike", "Adidas", "Puma", "Apple", "Samsung", "Sony", "BMW", "Mercedes", "Audi", "Volkswagen",
-           "Tesla", "IKEA", "McDonald's", "Coca-Cola", "Pepsi", "Red Bull", "Google", "Amazon", "Netflix", "LEGO",
-            "PlayStation", "Xbox", "Nespresso", "Nutella", "Haribo", "Nivea", "Zara", "H&M", "Lidl", "Aldi",
-            "Spotify", "TikTok", "Instagram", "YouTube", "Facebook", "Nestlé", "Ferrero", "Bosch", "Siemens", "Philips",
-            "Rewe", "Edeka", "Subway", "Starbucks", "Balenciaga", "Gucci", "Louis Vuitton", "Rolex", "Ritter Sport", "Dr. Oetker",
-            "Google Maps", "Telegram", "Snapchat", "WhatsApp", "Twitch", "CapCut", "BeReal", "Pinterest", "Uber", "Steam",
-            "Nike Air", "Jordan", "Converse", "Vans", "Crocs", "Birkenstock", "Skechers", "Under Armour", "New Balance", "Asics",
-            "Dell", "HP", "Lenovo", "Acer", "Huawei", "Oppo", "OnePlus", "Xiaomi", "Nikon", "Canon",
-             "EA Sports", "Ubisoft", "Rockstar Games", "Epic Games", "Blizzard", "Nintendo", "SEGA", "Bandai Namco", "Activision", "Valve",
-            "Maggi", "Milka", "Oreo", "Chips Ahoy", "Pringles", "Ben & Jerry’s", "Langnese", "Iglo", "Müller", "Philadelphia",
-            "Kaufland", "Decathlon", "MediaMarkt", "Saturn", "dm", "Rossmann", "Tchibo", "Depot", "Douglas", "Hornbach"],
- "Berufe": ["Arzt", "Lehrer", "Polizist", "Feuerwehrmann", "Pilot", "Koch", "Bäcker", "Friseur", "Mechaniker", "Programmierer",
-            "Ingenieur", "Designer", "Elektriker", "Krankenschwester", "Pfleger", "Zahnarzt", "Anwalt", "Richter", "Bauarbeiter",
-            "Verkäufer", "Musiker", "Schauspieler", "YouTuber", "Influencer", "Journalist", "Wissenschaftler", "Psychologe",
-            "Architekt", "Hausmeister", "Tierarzt", "Fotograf", "Fitnesscoach", "Landwirt", "Künstler", "Busfahrer", "Taxifahrer",
-            "Postbote", "Notar", "Therapeut", "Immobilienmakler", "Tänzer", "Sänger", "Schriftsteller", "Dolmetscher", "Sekretär"],
-"Tiere": ["Hund", "Katze", "Löwe", "Tiger", "Elefant", "Affe", "Bär", "Zebra", "Giraffe", "Krokodil",
-                "Känguru", "Nilpferd", "Pinguin", "Koala", "Fuchs", "Wolf", "Adler", "Eule", "Schlange",
-                "Kaninchen", "Hamster", "Pferd", "Schaf", "Kuh", "Huhn", "Ente", "Fisch", "Hai", "Delfin",
-                "Tintenfisch", "Papagei", "Taube", "Maus", "Igel", "Waschbär", "Marder", "Pfau", "Truthahn", "Alpaka"],
-"Länder/Städte": ["Deutschland", "Frankreich", "Italien", "Spanien", "Portugal", "USA", "Kanada", "Brasilien", "Argentinien",
-                "Japan", "China", "Südkorea", "Russland", "Australien", "Indien", "Ägypten", "Marokko", "Südafrika", "Mexiko",
-                "Berlin", "Paris", "London", "Rom", "Madrid", "New York", "Los Angeles", "Toronto", "Sydney", "Rio de Janeiro",
-                "Kapstadt", "Mumbai", "Peking", "Seoul", "Istanbul", "Amsterdam", "Wien", "Zürich", "Athen", "Oslo", "Dubai", "Seoul", "Bangkok", "Buenos Aires", "Kairo", "Hanoi", "Jakarta", "Tel Aviv", "Doha", "Helsinki",
-                "Prag", "Dublin", "Lissabon", "Reykjavík", "Montevideo", "Wellington", "Abu Dhabi", "Osaka", "Chicago", "San Francisco"],
-"Essen & Trinken": ["Pizza", "Burger", "Pommes", "Spaghetti", "Sushi", "Curry", "Döner", "Falafel", "Lasagne", "Hotdog",
-                "Croissant", "Torte", "Eis", "Schokolade", "Käse", "Toast", "Kuchen", "Pfannkuchen", "Gulasch", "Chili con Carne",
-                "Cola", "Wasser", "Eistee", "Bier", "Wein", "Cocktail", "Smoothie", "Fanta", "Kaffee", "Tee"],
-"Filme oder Serien": ["Harry Potter", "Avengers", "Titanic", "Star Wars", "Stranger Things", "Breaking Bad", "Wednesday", "Barbie",
-                "The Mandalorian", "Squid Game", "House of the Dragon", "The Boys", "The Crown", "Peaky Blinders", "Loki", "The Flash",
-                "Fast and Furious", "The Simpsons", "Rick and Morty", "Friends", "How I Met Your Mother", "Game of Thrones",
-                "Shrek", "Kung Fu Panda", "Spiderman", "Batman", "Frozen", "Moana", "Encanto", "Oppenheimer", "Attack on Titan", "Demon Slayer", "One Piece", "Jujutsu Kaisen", "Chainsaw Man", "Naruto", "My Hero Academia",
-                "Arcane", "Avatar – Der Herr der Elemente", "Invincible", "Stranger Things", "Wednesday", "Euphoria", "The Last of Us",
-                "Dark", "Money Heist", "You", "Outer Banks", "XO, Kitty", "The Queen's Gambit"],
-                "Sportarten": ["Fußball", "Basketball", "Tennis", "Boxen", "Volleyball", "Handball", "Schwimmen", "Leichtathletik", "Turnen",
-                "Golf", "Eishockey", "Baseball", "Cricket", "Skifahren", "Snowboarden", "Rudern", "Klettern", "Surfen", "Reiten", "Tischtennis", "Klettern", "Skaten", "Breakdance", "Parkour", "Rugby", "E-Sport", "Fechten", "Bogenschießen",
-                "Synchronschwimmen", "Trampolinspringen", "BMX", "Baseball", "Motorsport", "Biathlon", "Curling",
-                "Lacrosse", "Wasserspringen", "Kickboxen", "Squash", "Windsurfen"],
-"Kampfsportler": ["Conor McGregor", "Khabib Nurmagomedov", "Mike Tyson", "Muhammad Ali", "Bruce Lee", "Floyd Mayweather",
-                "Logan Paul", "Jake Paul", "Anderson Silva", "Ronda Rousey", "Israel Adesanya", "Tyson Fury", "Francis Ngannou",
-                "Jon Jones", "Chuck Norris", "Alex Pereira", "Sean O'Malley", "Ilia Topuria", "Leon Edwards", "Islam Makhachev", "Tom Aspinall",
-                "Merab Dvalishvili", "Alexa Grasso", "Zhang Weili", "Patty Pimblett", "Bo Nickal", "Kamaru Usman",
-                "Aljamain Sterling", "Canelo Álvarez", "Deontay Wilder", "Jake Paul", "Logan Paul", "Ryan Garcia",
-                "Israel Adesanya", "Shavkat Rakhmonov"],
-"Fußballer": [ "Lionel Messi", "Cristiano Ronaldo", "Kylian Mbappé", "Erling Haaland", "Robert Lewandowski", "Neymar",
-                 "Toni Kroos", "Luka Modrić", "Karim Benzema", "Kevin De Bruyne", "Mohamed Salah", "Harry Kane", "Thomas Müller",
-                 "Sadio Mané", "Joshua Kimmich", "Manuel Neuer", "Marc-André ter Stegen", "Jude Bellingham", "Vinicius Jr.",
-                 "Jamal Musiala", "Lamine Yamal", "Xavi Simons", "Alejandro Garnacho", "Endrick", "Pedri", "Gavi", "Florian Wirtz", "Rasmus Højlund",
-                 "João Félix", "Phil Foden", "Declan Rice", "Martin Ødegaard", "Bukayo Saka", "Josko Gvardiol", "Khvicha Kvaratskhelia",
-                 "Dominik Szoboszlai", "Álex Grimaldo", "Victor Osimhen", "Enzo Fernández", "Jérémy Doku"],
-"Hobbys": [ "Lesen", "Zeichnen", "Musik hören", "Videospiele", "Schreiben", "Kochen", "Backen", "Sport treiben", "Joggen",
-                 "Wandern", "Reiten", "Fotografieren", "Filme schauen", "Tanzen", "Schwimmen", "Fahrradfahren", "Yoga", "Gärtnern",
-                 "Stricken", "Nähen", "Longboard fahren", "Podcasts hören", "Meditieren", "Kalligrafie", "Geocaching", "Graffiti", "Beatboxen",
-                 "Drohne fliegen", "Cosplay", "Escape Rooms", "Origami", "Schauspiel", "Improvisation", "Mixology", "Bouldern",
-                 "Astronomie", "Aquaristik", "Comics sammeln", "Tischspiele spielen", "Fischen"],
-"Videospiele": [ "Minecraft", "Fortnite", "FIFA", "GTA V", "Call of Duty", "Among Us", "Roblox", "League of Legends",
-                 "Valorant", "CS:GO", "The Sims", "Zelda", "Mario Kart", "Animal Crossing", "PUBG", "Overwatch", "Rocket League",
-                 "Clash Royale", "Brawl Stars", "Pokémon Go", "Elden Ring", "Hogwarts Legacy", "The Legend of Zelda: Tears of the Kingdom", "Super Mario Odyssey",
-                 "Red Dead Redemption 2", "Cyberpunk 2077", "The Witcher 3", "Resident Evil 4", "God of War Ragnarök",
-                 "Apex Legends", "Genshin Impact", "Fall Guys", "Hades", "Dead by Daylight", "Stardew Valley", "Warzone",
-                 "Battlefield", "Dota 2", "Honkai: Star Rail", "Five Nights at Freddy's"],
-"Apps": ["Instagram", "TikTok", "WhatsApp", "YouTube", "Spotify", "Snapchat", "Google Maps", "Amazon", "Netflix",
-          "Twitter", "Facebook", "Telegram", "Discord", "Zoom", "Teams", "Google Drive", "eBay", "Klarna", "Pinterest", "Reddit", "BeReal", "CapCut", "Duolingo", "ChatGPT", "Shazam", "GoodNotes", "Notion", "Blitz", "Twitch", "Depop",
-          "Too Good To Go", "Yuka", "Airbnb", "Tinder", "Jodel", "OneFootball", "Telegram", "Google Photos", "Steam", "Uber"],
-    "Schulfächer": ["Mathematik", "Deutsch", "Englisch", "Biologie", "Physik", "Chemie", "Geschichte", "Erdkunde", "Informatik", "Sport",
-                 "Musik", "Kunst", "Religion", "Ethik", "Wirtschaft", "Politik", "Philosophie", "Spanisch", "Französisch", "Latein",
-                 "Technik", "Sozialwissenschaften", "Darstellen und Gestalten", "Hauswirtschaft", "Gesundheit"],
-    "Fantasiefiguren": ["Drache", "Vampir", "Einhorn", "Zauberer", "Hexe", "Meerjungfrau", "Geist", "Kobold", "Troll", "Elf",
-                       "Feuerdämon", "Werwolf", "Zombie", "Phönix", "Riese", "Schneemonster", "Dämon", "Ork", "Golem", "Greif",
-                       "Zyklop", "Centaur", "Pegasus", "Dschinn", "Skelettkrieger"],
+  <canvas id="c"></canvas>
 
+<script>
+(() => {
+  const canvas = document.getElementById("c");
+  const ctx = canvas.getContext("2d");
+
+  const uiScore = document.getElementById("score");
+  const uiHp = document.getElementById("hp");
+  const uiWave = document.getElementById("wave");
+  const over = document.getElementById("over");
+  document.getElementById("restart").addEventListener("click", () => reset());
+
+  const joyL = makeJoystick(document.getElementById("joyL"), document.getElementById("knobL"));
+
+  const S = {
+    w:0,h:0,t:0, dt:0,
+    score:0,wave:1,gameOver:false,
+    camX:0,
+    world: { zMin: -1.2, zMax: 1.2 },
+    player: { x: 0, y: 0, z: 0, hp: 100, inv: 0, spdY: 260, spdZ: 1.6, r: 0.22 },
+    bullets: [],
+    enemies: [],
+    particles: [],
+    lastShot: 0,
+    shotRate: 0.16,
+    difficulty: {
+      baseEnemies: 6,
+      maxEnemies: 18,
+      spawnPadding: 7,
+      enemySpd: 2.0,
+      enemyDmg: 10
+    }
+  };
+
+  function resize(){
+    const dpr = Math.max(1, Math.min(2, devicePixelRatio || 1));
+    S.w = innerWidth; S.h = innerHeight;
+    canvas.width = Math.floor(S.w * dpr);
+    canvas.height = Math.floor(S.h * dpr);
+    canvas.style.width = S.w + "px";
+    canvas.style.height = S.h + "px";
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  addEventListener("resize", resize);
+
+  function clamp(v,a,b){ return Math.max(a, Math.min(b, v)); }
+  function lerp(a,b,t){ return a + (b-a)*t; }
+  function rand(a,b){ return a + Math.random()*(b-a); }
+  function randi(a,b){ return (a + Math.floor(Math.random()*(b-a+1))); }
+  function len(x,y){ return Math.hypot(x,y); }
+  function norm(x,y){ const L = len(x,y) || 1; return {x:x/L,y:y/L}; }
+
+  function proj(x, y, z){
+    const horizon = S.h * 0.58;
+    const persp = 0.72;
+    const depth = 1 + (z * 0.28);
+    const scale = (0.92 / depth);
+    const sx = x;
+    const sy = horizon + (y - horizon) * scale + z * 40;
+    return { x:sx, y:sy, s:scale };
+  }
+
+  function updateUI(){
+    uiScore.textContent = String(S.score);
+    uiHp.textContent = String(Math.max(0, Math.floor(S.player.hp)));
+    uiWave.textContent = String(S.wave);
+    over.style.display = S.gameOver ? "flex" : "none";
+  }
+
+  function reset(){
+    S.t = 0;
+    S.score = 0;
+    S.wave = 1;
+    S.gameOver = false;
+    S.camX = 0;
+    S.player.x = S.w * 0.18;
+    S.player.y = S.h * 0.62;
+    S.player.z = 0;
+    S.player.hp = 100;
+    S.player.inv = 0;
+    S.bullets.length = 0;
+    S.enemies.length = 0;
+    S.particles.length = 0;
+    S.lastShot = 0;
+    joyL.reset();
+    spawnWave();
+    updateUI();
+  }
+
+  function makeEnemyLook(){
+    const palette = [
+      ["#ff6b6b","#ffb86b","#ffd36b"],
+      ["#7ee7ff","#6bbcff","#9b7bff"],
+      ["#a8ff6b","#6bffb1","#6bffef"],
+      ["#ff6bf6","#ff6bb2","#ff8c6b"]
+    ][randi(0,3)];
+
+    const type = randi(0,4);
+    const horns = Math.random() < 0.55;
+    const eyeCount = randi(1,3);
+    const spikes = randi(0,6);
+    const stripe = Math.random() < 0.5;
+
+    return {
+      type,
+      horns,
+      eyeCount,
+      spikes,
+      stripe,
+      c1: palette[0],
+      c2: palette[1],
+      c3: palette[2],
+      wobble: rand(1.2, 2.6),
+      seed: Math.random()*9999
     };
+  }
 
-    let assignedWords = {};
-    let impostors = [];
-    let gameStarted = false;
+  function spawnEnemy(){
+    const z = rand(S.world.zMin, S.world.zMax);
+    const x = S.w + rand(120, 420);
+    const yBase = lerp(S.h*0.50, S.h*0.80, 0.55 + z*0.12);
+    const y = yBase + rand(-40, 40);
 
-    document.getElementById("toggleCategoryButton").addEventListener("click", function (e) {
-      e.stopPropagation();
-      const dropdown = this.parentElement;
-      dropdown.classList.toggle("open");
+    const waveBoost = 1 + S.wave * 0.06;
+    const spd = S.difficulty.enemySpd * waveBoost * rand(0.85, 1.10);
+    const hp = Math.floor(35 * waveBoost + rand(0, 18));
+    const r = rand(0.20, 0.30);
+
+    S.enemies.push({
+      x, y, z,
+      spd,
+      hp, maxHp: hp,
+      r,
+      hit: 0,
+      look: makeEnemyLook()
+    });
+  }
+
+  function spawnWave(){
+    const n = Math.min(S.difficulty.baseEnemies + Math.floor(S.wave*1.1), S.difficulty.maxEnemies);
+    for(let i=0;i<n;i++) spawnEnemy();
+  }
+
+  function explode(x,y,z,count=18){
+    for(let i=0;i<count;i++){
+      const a = rand(0, Math.PI*2);
+      const sp = rand(80, 320);
+      const vx = Math.cos(a)*sp;
+      const vy = Math.sin(a)*sp;
+      S.particles.push({ x, y, z, vx, vy, life: rand(0.25, 0.6), r: rand(1.2, 3.2) });
+    }
+  }
+
+  function autoTarget(){
+    let best = null;
+    let bestScore = 1e9;
+    for(const e of S.enemies){
+      const dz = Math.abs(e.z - S.player.z);
+      const dx = e.x - S.player.x;
+      if(dx < -60) continue;
+      const score = dx + dz*220 + Math.abs(e.y - S.player.y)*0.35;
+      if(score < bestScore){
+        bestScore = score;
+        best = e;
+      }
+    }
+    return best;
+  }
+
+  function shootAt(e){
+    const now = S.t;
+    if(now - S.lastShot < S.shotRate) return;
+    S.lastShot = now;
+
+    const p = S.player;
+
+    const to = proj(e.x, e.y, e.z);
+    const from = proj(p.x, p.y, p.z);
+
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const d = norm(dx, dy);
+
+    const speed = 640;
+    S.bullets.push({
+      x: p.x + 20,
+      y: p.y,
+      z: p.z,
+      vx: d.x * speed,
+      vy: d.y * speed,
+      life: 0.9,
+      dmg: 22 + S.wave*1.2
     });
 
-    document.addEventListener("click", function (e) {
-      const dropdown = document.querySelector(".category-dropdown");
-      if (!dropdown.contains(e.target)) {
-        dropdown.classList.remove("open");
-      }
-    });
-
-    document.getElementById("selectAll").addEventListener("change", function () {
-      const checks = document.querySelectorAll(".cat-check");
-      checks.forEach(cb => cb.checked = this.checked);
-    });
-
-    function getSelectedCategories() {
-      const checks = document.querySelectorAll(".cat-check:checked");
-      let words = [];
-      checks.forEach(cb => words = words.concat(categories[cb.value] || []));
-      return words;
-    }
-
-    function addPlayer() {
-      const name = document.getElementById("playerName").value.trim();
-      if (name && !players.includes(name)) {
-        players.push(name);
-        displayPlayers();
-        document.getElementById("playerName").value = "";
-      }
-    }
-
-    function removePlayer(name) {
-      const index = players.indexOf(name);
-      if (index !== -1) {
-        players.splice(index, 1);
-        displayPlayers();
-      }
-    }
-
-    function displayPlayers() {
-      const playerList = document.getElementById("playerList");
-      playerList.innerHTML = "";
-      players.forEach(name => {
-        const container = document.createElement("div");
-        const btn = document.createElement("button");
-        btn.textContent = name;
-        btn.onclick = () => {
-          if (gameStarted) {
-            toggleWord(name, btn);
-          }
-        };
-        container.appendChild(btn);
-        if (!gameStarted) {
-          const remove = document.createElement("button");
-          remove.textContent = "×";
-          remove.className = "remove-btn";
-          remove.onclick = (e) => {
-            e.stopPropagation();
-            removePlayer(name);
-          };
-          container.appendChild(remove);
-        }
-        playerList.appendChild(container);
+    for(let i=0;i<7;i++){
+      S.particles.push({
+        x: p.x + 18,
+        y: p.y,
+        z: p.z,
+        vx: d.x*rand(60,140) + rand(-60,60),
+        vy: d.y*rand(60,140) + rand(-60,60),
+        life: rand(0.12, 0.22),
+        r: rand(1, 2.4)
       });
     }
+  }
 
-    function startGame() {
-      const impostorCount = parseInt(document.getElementById("impostorCount").value);
-      const wordPool = getSelectedCategories();
+  function damagePlayer(amount){
+    const p = S.player;
+    if(p.inv > 0) return;
+    p.hp -= amount;
+    p.inv = 0.45;
+    if(p.hp <= 0){
+      p.hp = 0;
+      S.gameOver = true;
+    }
+    updateUI();
+  }
 
-      if (players.length < 3) {
-        alert("Mindestens 3 Spieler erforderlich.");
-        return;
-      }
-      if (wordPool.length === 0) {
-        alert("Bitte mindestens eine Kategorie auswählen.");
-        return;
-      }
-      if (impostorCount >= players.length) {
-        alert("Impostor-Anzahl muss kleiner als Spieleranzahl sein.");
-        return;
-      }
+  function step(dt){
+    S.t += dt;
+    S.dt = dt;
 
-      assignedWords = {};
-      impostors = [];
-      gameStarted = true;
+    const p = S.player;
+    if(p.inv > 0) p.inv -= dt;
 
-      const selectedWord = wordPool[Math.floor(Math.random() * wordPool.length)];
-      const shuffled = [...players].sort(() => Math.random() - 0.5);
-      impostors = shuffled.slice(0, impostorCount);
-
-      for (const name of players) {
-        assignedWords[name] = impostors.includes(name) ? "IMPOSTOR" : selectedWord;
+    if(!S.gameOver){
+      const mv = joyL.value();
+      if(mv.mag > 0.05){
+        p.y += mv.y * p.spdY * dt;
+        p.z += mv.y * 0.9 * dt;
       }
 
-      displayPlayers();
-      alert("Wörter wurden verteilt! Klicke auf deinen Namen, um dein Wort zu sehen.");
+      p.y = clamp(p.y, S.h*0.42, S.h*0.86);
+      p.z = clamp(p.z, S.world.zMin, S.world.zMax);
+
+      const target = autoTarget();
+      if(target) shootAt(target);
     }
 
-    function toggleWord(name, button) {
-      if (button.classList.contains("word-box")) {
-        displayPlayers();
-      } else if (assignedWords[name]) {
-        const wordBox = document.createElement("div");
-        wordBox.className = "word-box";
-        wordBox.textContent = assignedWords[name];
-        wordBox.onclick = () => toggleWord(name, wordBox);
-        button.replaceWith(wordBox);
+    S.camX += 120 * dt;
+
+    for(let i=S.bullets.length-1;i>=0;i--){
+      const b = S.bullets[i];
+      b.x += b.vx*dt;
+      b.y += b.vy*dt;
+      b.life -= dt;
+      if(b.life <= 0 || b.x > S.w + 200 || b.y < -200 || b.y > S.h + 200) S.bullets.splice(i,1);
+    }
+
+    for(let i=S.enemies.length-1;i>=0;i--){
+      const e = S.enemies[i];
+      if(e.hit > 0) e.hit -= dt;
+
+      if(!S.gameOver){
+        e.x -= e.spd * 120 * dt;
+        e.y += Math.sin(S.t * e.look.wobble + e.look.seed) * 18 * dt;
+      }
+
+      const p2 = proj(p.x, p.y, p.z);
+      const e2 = proj(e.x, e.y, e.z);
+      const rr = (p.r*120) * p2.s + (e.r*140) * e2.s;
+      const dx = e2.x - p2.x;
+      const dy = e2.y - p2.y;
+      if(!S.gameOver && dx*dx + dy*dy < rr*rr){
+        damagePlayer(S.difficulty.enemyDmg);
+        e.x += 80;
+      }
+
+      if(e.x < -240){
+        S.enemies.splice(i,1);
       }
     }
 
-    function resetGame() {
-      assignedWords = {};
-      impostors = [];
-      gameStarted = false;
-      players.sort(() => Math.random() - 0.5);
-      displayPlayers();
-      document.getElementById("impostorCount").value = 1;
+    for(let i=S.enemies.length-1;i>=0;i--){
+      const e = S.enemies[i];
+      const e2 = proj(e.x, e.y, e.z);
+
+      for(let j=S.bullets.length-1;j>=0;j--){
+        const b = S.bullets[j];
+        const b2 = proj(b.x, b.y, p.z);
+        const rr = (e.r*140)*e2.s;
+
+        const dx = e2.x - b2.x;
+        const dy = e2.y - b2.y;
+        if(dx*dx + dy*dy < rr*rr){
+          e.hp -= b.dmg;
+          e.hit = 0.10;
+          S.bullets.splice(j,1);
+          explode(b.x, b.y, e.z, 10);
+
+          if(e.hp <= 0){
+            explode(e.x, e.y, e.z, 26);
+            S.enemies.splice(i,1);
+            S.score += 12;
+            updateUI();
+          }
+          break;
+        }
+      }
     }
-  </script>
+
+    for(let i=S.particles.length-1;i>=0;i--){
+      const q = S.particles[i];
+      q.x += q.vx*dt;
+      q.y += q.vy*dt;
+      q.vx *= Math.pow(0.03, dt);
+      q.vy *= Math.pow(0.03, dt);
+      q.life -= dt;
+      if(q.life <= 0) S.particles.splice(i,1);
+    }
+
+    if(!S.gameOver && S.enemies.length === 0){
+      S.wave += 1;
+      spawnWave();
+      updateUI();
+    }
+
+    if(!S.gameOver && S.player.hp < 100){
+      S.player.hp = Math.min(100, S.player.hp + 2.2*dt);
+      updateUI();
+    }
+  }
+
+  function drawBackground(){
+    const g = ctx.createLinearGradient(0,0,0,S.h);
+    g.addColorStop(0, "#0b1230");
+    g.addColorStop(1, "#05070f");
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,S.w,S.h);
+
+    const horizon = S.h * 0.58;
+
+    ctx.fillStyle = "rgba(255,255,255,0.04)";
+    for(let i=0;i<70;i++){
+      const x = (i*140 + (S.camX*0.25)) % (S.w+240) - 120;
+      const y = (i*37) % (horizon - 20);
+      const r = 1 + (i%3)*0.6;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI*2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = "rgba(120,160,255,0.08)";
+    ctx.fillRect(0, horizon, S.w, S.h-horizon);
+
+    ctx.strokeStyle = "rgba(255,255,255,0.06)";
+    ctx.lineWidth = 2;
+    for(let k=0;k<9;k++){
+      const z = lerp(S.world.zMin, S.world.zMax, k/8);
+      const y = horizon + z*40 + 120;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(S.w, y);
+      ctx.stroke();
+    }
+
+    ctx.strokeStyle = "rgba(255,255,255,0.07)";
+    ctx.lineWidth = 1;
+    for(let i=0;i<18;i++){
+      const x = (i*180 + (S.camX*0.8)) % (S.w+360) - 180;
+      ctx.beginPath();
+      ctx.moveTo(x, horizon);
+      ctx.lineTo(x+120, S.h);
+      ctx.stroke();
+    }
+  }
+
+  function drawEnemy(e){
+    const p = proj(e.x, e.y, e.z);
+    const size = 120 * e.r * p.s;
+    const x = p.x, y = p.y;
+
+    const L = e.look;
+    const pulse = 1 + Math.sin(S.t*3 + L.seed)*0.03;
+
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(pulse, pulse);
+
+    const bodyW = size * (0.9 + L.type*0.05);
+    const bodyH = size * (0.85 + (L.type%2)*0.08);
+
+    ctx.shadowColor = "rgba(0,0,0,0.35)";
+    ctx.shadowBlur = 18 * p.s;
+    ctx.shadowOffsetY = 10 * p.s;
+
+    ctx.beginPath();
+    if(L.type === 0){
+      roundedRect(-bodyW*0.52, -bodyH*0.55, bodyW*1.04, bodyH*1.08, bodyW*0.22);
+    } else if(L.type === 1){
+      blob(0, 0, bodyW*0.55, bodyH*0.55, 8);
+    } else if(L.type === 2){
+      ctx.ellipse(0, 0, bodyW*0.58, bodyH*0.52, 0.2, 0, Math.PI*2);
+    } else if(L.type === 3){
+      roundedRect(-bodyW*0.50, -bodyH*0.45, bodyW, bodyH*0.90, bodyW*0.18);
+      ctx.moveTo(-bodyW*0.35, -bodyH*0.10);
+      ctx.quadraticCurveTo(0, -bodyH*0.70, bodyW*0.35, -bodyH*0.10);
+    } else {
+      blob(0, 0, bodyW*0.58, bodyH*0.48, 10);
+    }
+
+    ctx.fillStyle = e.hit>0 ? shade(L.c1, 0.25) : L.c1;
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    if(L.stripe){
+      ctx.globalAlpha = 0.25;
+      ctx.fillStyle = L.c2;
+      for(let s=0;s<5;s++){
+        const sx = lerp(-bodyW*0.40, bodyW*0.40, s/4);
+        ctx.beginPath();
+        ctx.roundRect(sx - bodyW*0.06, -bodyH*0.40, bodyW*0.12, bodyH*0.80, bodyW*0.08);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    if(L.horns){
+      ctx.fillStyle = L.c3;
+      const hx = bodyW*0.28;
+      const hy = -bodyH*0.55;
+      horn(-hx, hy, bodyW*0.14, bodyH*0.28);
+      horn(hx, hy, bodyW*0.14, bodyH*0.28);
+    }
+
+    if(L.spikes > 0){
+      ctx.fillStyle = shade(L.c2, -0.1);
+      for(let i=0;i<L.spikes;i++){
+        const a = lerp(-2.2, 2.2, i/(L.spikes-1 || 1));
+        const rx = Math.cos(a) * bodyW*0.58;
+        const ry = Math.sin(a) * bodyH*0.48;
+        spike(rx, ry, bodyW*0.08, bodyH*0.10, a);
+      }
+    }
+
+    const eyeY = -bodyH*0.10;
+    const spread = bodyW*0.22;
+    for(let i=0;i<L.eyeCount;i++){
+      const ex = (i - (L.eyeCount-1)/2) * spread;
+      eye(ex, eyeY + Math.sin(S.t*4 + L.seed + i)*2, bodyW*0.12, bodyH*0.11, L.c3);
+    }
+
+    const hpPct = clamp(e.hp / e.maxHp, 0, 1);
+    ctx.globalAlpha = 0.9;
+    ctx.fillStyle = "rgba(0,0,0,0.30)";
+    ctx.fillRect(-bodyW*0.50, -bodyH*0.78, bodyW, 6);
+    ctx.fillStyle = "rgba(140,255,140,0.90)";
+    ctx.fillRect(-bodyW*0.50, -bodyH*0.78, bodyW*hpPct, 6);
+    ctx.globalAlpha = 1;
+
+    ctx.restore();
+  }
+
+  function drawPlayer(){
+    const p = S.player;
+    const pr = proj(p.x, p.y, p.z);
+    const size = 66 * pr.s;
+
+    ctx.save();
+    ctx.translate(pr.x, pr.y);
+
+    ctx.shadowColor = "rgba(0,0,0,0.35)";
+    ctx.shadowBlur = 18 * pr.s;
+    ctx.shadowOffsetY = 10 * pr.s;
+
+    ctx.beginPath();
+    roundedRect(-size*0.6, -size*0.52, size*1.2, size*1.04, size*0.28);
+    ctx.fillStyle = p.inv>0 ? "rgba(140,200,255,0.70)" : "rgba(140,200,255,0.95)";
+    ctx.fill();
+
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetY = 0;
+
+    ctx.fillStyle = "rgba(230,245,255,0.95)";
+    ctx.beginPath();
+    ctx.roundRect(size*0.15, -size*0.12, size*0.70, size*0.24, size*0.12);
+    ctx.fill();
+
+    ctx.fillStyle = "rgba(30,40,60,0.9)";
+    ctx.beginPath();
+    ctx.arc(-size*0.18, -size*0.06, size*0.12, 0, Math.PI*2);
+    ctx.arc(size*0.02, -size*0.06, size*0.12, 0, Math.PI*2);
+    ctx.fill();
+
+    ctx.restore();
+  }
+
+  function drawBullets(){
+    for(const b of S.bullets){
+      const p = proj(b.x, b.y, S.player.z);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 5*p.s, 0, Math.PI*2);
+      ctx.fillStyle = "rgba(120,200,255,0.95)";
+      ctx.fill();
+
+      ctx.globalAlpha = 0.25;
+      ctx.beginPath();
+      ctx.arc(p.x - 10*p.s, p.y, 10*p.s, 0, Math.PI*2);
+      ctx.fillStyle = "rgba(120,200,255,0.95)";
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function drawParticles(){
+    for(const q of S.particles){
+      const p = proj(q.x, q.y, q.z ?? S.player.z);
+      const a = clamp(q.life*2, 0, 1);
+      ctx.globalAlpha = a;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, q.r*p.s, 0, Math.PI*2);
+      ctx.fillStyle = "rgba(240,245,255,0.95)";
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    }
+  }
+
+  function draw(){
+    drawBackground();
+
+    drawParticles();
+    drawBullets();
+
+    const sorted = [...S.enemies].sort((a,b) => (a.z - b.z));
+    for(const e of sorted) drawEnemy(e);
+
+    drawPlayer();
+
+    if(S.gameOver){
+      ctx.fillStyle = "rgba(0,0,0,0.25)";
+      ctx.fillRect(0,0,S.w,S.h);
+    }
+  }
+
+  function roundedRect(x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y);
+    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
+    ctx.lineTo(x+w, y+h-r);
+    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
+    ctx.lineTo(x+r, y+h);
+    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
+    ctx.lineTo(x, y+r);
+    ctx.quadraticCurveTo(x, y, x+r, y);
+    ctx.closePath();
+  }
+
+  function blob(cx, cy, rx, ry, pts){
+    ctx.beginPath();
+    for(let i=0;i<=pts;i++){
+      const a = (i/pts) * Math.PI*2;
+      const n = 1 + Math.sin(a*3 + cx*0.01 + cy*0.01)*0.06 + Math.cos(a*5)*0.04;
+      const x = cx + Math.cos(a)*rx*n;
+      const y = cy + Math.sin(a)*ry*n;
+      if(i===0) ctx.moveTo(x,y); else ctx.quadraticCurveTo(cx, cy, x, y);
+    }
+    ctx.closePath();
+  }
+
+  function horn(x,y,w,h){
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.quadraticCurveTo(x+w*0.2, y-h*0.8, x+w*0.6, y-h);
+    ctx.quadraticCurveTo(x+w, y-h*0.7, x+w*0.9, y);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  function spike(x,y,w,h,a){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.rotate(a);
+    ctx.beginPath();
+    ctx.moveTo(0,0);
+    ctx.lineTo(w*0.7, -h);
+    ctx.lineTo(w*1.4, 0);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+
+  function eye(x,y,rx,ry,accent){
+    ctx.save();
+    ctx.translate(x,y);
+    ctx.beginPath();
+    ctx.ellipse(0,0,rx,ry,0,0,Math.PI*2);
+    ctx.fillStyle = "rgba(255,255,255,0.92)";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(rx*0.1, ry*0.05, rx*0.45, ry*0.55, 0, 0, Math.PI*2);
+    ctx.fillStyle = "rgba(20,25,35,0.92)";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(rx*0.25, ry*0.10, rx*0.18, ry*0.20, 0, 0, Math.PI*2);
+    ctx.fillStyle = accent;
+    ctx.globalAlpha = 0.7;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+  }
+
+  function shade(hex, amt){
+    const c = hex.replace("#","");
+    const r = parseInt(c.slice(0,2),16);
+    const g = parseInt(c.slice(2,4),16);
+    const b = parseInt(c.slice(4,6),16);
+    const k = amt;
+    const rr = clamp(Math.round(r + 255*k), 0, 255);
+    const gg = clamp(Math.round(g + 255*k), 0, 255);
+    const bb = clamp(Math.round(b + 255*k), 0, 255);
+    return "#" + rr.toString(16).padStart(2,"0") + gg.toString(16).padStart(2,"0") + bb.toString(16).padStart(2,"0");
+  }
+
+  function makeJoystick(baseEl, knobEl){
+    const st = { active:false, id:null, cx:0, cy:0, x:0, y:0, max:52 };
+
+    function center(){
+      const r = baseEl.getBoundingClientRect();
+      st.cx = r.left + r.width/2;
+      st.cy = r.top + r.height/2;
+    }
+
+    function setKnob(x,y){
+      knobEl.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    function moveTouch(x,y){
+      const dx = x - st.cx;
+      const dy = y - st.cy;
+      const L = Math.hypot(dx,dy);
+      const m = L > st.max ? st.max / (L || 1) : 1;
+      st.x = dx * m;
+      st.y = dy * m;
+      setKnob(st.x, st.y);
+    }
+
+    function onDown(e){
+      const t = e.changedTouches[0];
+      st.active = true;
+      st.id = t.identifier;
+      center();
+      moveTouch(t.clientX, t.clientY);
+    }
+
+    function onMove(e){
+      if(!st.active) return;
+      for(const t of e.changedTouches){
+        if(t.identifier === st.id){
+          moveTouch(t.clientX, t.clientY);
+          break;
+        }
+      }
+    }
+
+    function onUp(e){
+      if(!st.active) return;
+      for(const t of e.changedTouches){
+        if(t.identifier === st.id){
+          st.active = false;
+          st.id = null;
+          st.x = 0; st.y = 0;
+          setKnob(0,0);
+          break;
+        }
+      }
+    }
+
+    baseEl.addEventListener("touchstart", (e)=>{ e.preventDefault(); onDown(e); }, {passive:false});
+    window.addEventListener("touchmove", (e)=>{ e.preventDefault(); onMove(e); }, {passive:false});
+    window.addEventListener("touchend", (e)=>{ e.preventDefault(); onUp(e); }, {passive:false});
+    window.addEventListener("touchcancel", (e)=>{ e.preventDefault(); onUp(e); }, {passive:false});
+
+    return {
+      value(){
+        const x = st.x / st.max;
+        const y = st.y / st.max;
+        const mag = Math.hypot(x,y);
+        return mag>0 ? { x, y, mag } : { x:0, y:0, mag:0 };
+      },
+      reset(){
+        st.active=false; st.id=null; st.x=0; st.y=0;
+        setKnob(0,0);
+      }
+    };
+  }
+
+  let last = performance.now();
+  function loop(now){
+    const dt = Math.min(0.033, (now-last)/1000);
+    last = now;
+    step(dt);
+    draw();
+    requestAnimationFrame(loop);
+  }
+
+  resize();
+  reset();
+  requestAnimationFrame(loop);
+})();
+</script>
 </body>
 </html>
- </body>
- </html>
